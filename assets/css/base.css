@@ -1,0 +1,68 @@
+/* ============
+   CSS Reset
+============ */
+
+*,
+*::before,
+*::after {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+html {
+  text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100svh;
+  direction: rtl;
+  overflow-x: hidden;
+}
+
+input,
+textarea,
+button,
+select {
+  font: inherit;
+  background: none;
+  border: none;
+}
+
+a,
+a:visited,
+button,
+input[type='button'],
+input[type='submit'] {
+  cursor: pointer;
+  text-decoration: none;
+
+  background: none;
+  border: none;
+}
+
+ul,
+ol,
+menu,
+nav {
+  list-style: none;
+}
+
+img,
+picture,
+video,
+svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  flex-shrink: 0;
+}
+
+svg polygon,
+svg path,
+svg rect,
+svg circle,
+svg line {
+  fill: currentColor;
+  stroke: currentColor;
+}
