@@ -1,0 +1,67 @@
+:root {
+  /* ============
+     Solid Colors
+     ============ */
+  --color-primary-1: #788d7a;
+
+  --color-light-1: #fffef9;
+  --color-light-2: #f0efe9;
+
+  --color-nutral-1: #a8a7a0;
+  --color-nutral-2: #d9d9d9;
+
+  --color-error-1: #e38976;
+
+  /* ===============
+     Gradient Colors
+     =============== */
+
+  /* ==========
+     Typography
+     ========== */
+  font-size: 100%;
+  --font-family: 'Afek', sans-serif;
+
+  /* ================
+     Shapes & Borders
+     ================ */
+  --border-radius-l: 0.75rem;
+  --border-radius-m: 0.5rem;
+  --border-radius-s: 0.25rem;
+
+  /* ======
+     Layout
+     ====== */
+
+  /* ==========
+     Animations
+     ========== */
+  --animation-duration: 600ms;
+  --animation-delay: 200ms;
+  --animation-timing-funtion: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =====
+   Fonts
+   ===== */
+
+@font-face {
+  font-family: 'Afek';
+  font-weight: 400; /* Regular */
+  font-style: normal;
+  src: url('/assets/fonts/afek-regular-aaa.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Afek';
+  font-weight: 700; /* Bold */
+  font-style: normal;
+  src: url('/assets/fonts/afek-bold-aaa.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Afek';
+  font-weight: 800; /* Ultra Bold */
+  font-style: normal;
+  src: url('/assets/fonts/afek-ultrabold-aaa.woff2') format('woff2');
+}
