@@ -1,6 +1,10 @@
 @import url('/assets/css/base.css');
 @import url('/assets/css/brand.css');
 
+/* =======
+   Buttons
+   ======= */
+
 .btn {
   display: flex;
   justify-content: center;
@@ -8,7 +12,6 @@
 
   font-weight: 700;
 
-  padding: 0.5rem 1rem;
   border-radius: var(--border-radius-m);
 }
 
@@ -17,14 +20,38 @@
 }
 
 .btn-cancel {
+  font-size: 0.8rem;
+
   color: var(--color-light-1);
   background-color: var(--color-error-1);
+
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--border-radius-s);
 }
 
-.btn-cancel.btn-icon svg {
-  width: 1.25rem;
+.btn-cancel #x-mark {
+  font-size: 1rem;
+  transform: translateY(-0.5px);
 }
 
 .btn-icon {
-  gap: 2px;
+  gap: 1px;
+}
+
+/* ======
+   Header
+   ====== */
+.header-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-logo {
+  width: 5.5rem;
+}
+
+.header-logo path {
+  fill: var(--color-primary-1);
+  stroke: var(--color-primary-1);
 }

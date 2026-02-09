@@ -9,6 +9,7 @@ body {
 
 .wrapper {
   width: clamp(20rem, 100%, 40rem);
+  margin: 1rem 1.75rem;
 }
 
 header,
