@@ -65,3 +65,7 @@
   font-style: normal;
   src: url('/assets/fonts/afek-ultrabold-aaa.woff2') format('woff2');
 }
+
+body {
+  font-family: var(--font-family);
+}
