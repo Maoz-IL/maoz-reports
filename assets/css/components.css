@@ -43,6 +43,14 @@
 /* ======
    Header
    ====== */
+
+header {
+  position: sticky;
+  top: 0;
+
+  background-color: inherit;
+}
+
 .header-wrapper {
   display: flex;
   justify-content: space-between;
@@ -56,4 +64,15 @@
 .header-logo path {
   fill: var(--color-primary-1);
   stroke: var(--color-primary-1);
+}
+
+/* ======
+   Footer
+   ====== */
+
+footer {
+  position: sticky;
+  bottom: 0;
+
+  background-color: inherit;
 }
