@@ -19,23 +19,25 @@
   background-color: var(--color-primary-1);
 }
 
+.btn-secondary {
+  background-color: transparent;
+  border: 3px solid;
+}
+
 .btn-cancel {
-  font-size: 0.8rem;
+  font-size: 1rem;
 
-  color: var(--color-light-1);
-  background-color: var(--color-error-1);
+  color: var(--color-error-1);
+  border-color: var(--color-error-1);
 
-  padding: 0.4rem 0.7rem;
-  border-radius: var(--border-radius-s);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--border-radius-m);
 }
 
 .btn-cancel #x-mark {
   font-size: 1rem;
+  margin-left: 1px;
   transform: translateY(-0.5px);
-}
-
-.btn-icon {
-  gap: 1px;
 }
 
 /* ======
