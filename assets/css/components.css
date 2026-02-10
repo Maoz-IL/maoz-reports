@@ -21,7 +21,7 @@
 
 .btn-secondary {
   background-color: transparent;
-  border: 3px solid;
+  border: 2.5px solid;
 }
 
 .btn-cancel {
@@ -43,6 +43,15 @@
 .btn-disabled {
   color: var(--color-nutral-1);
   background-color: var(--color-nutral-2);
+}
+
+/* ===============
+   Header & Footer
+   =============== */
+
+header,
+footer {
+  height: fit-content;
 }
 
 /* ======
@@ -131,4 +140,21 @@ footer {
   fill: var(--color-primary-1);
 
   opacity: 0;
+}
+
+/* ====
+   Form
+   ==== */
+
+form .steps {
+  display: grid;
+}
+
+form .steps div {
+  grid-area: 1 / 1;
+
+  font-size: 20rem;
+  font-weight: 800;
+  opacity: 0.3;
+  text-align: center;
 }

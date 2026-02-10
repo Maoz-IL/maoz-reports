@@ -3,7 +3,6 @@
 
 body {
   display: grid;
-  grid-template-rows: 0.75fr 7fr 1fr;
   justify-content: center;
 }
 
