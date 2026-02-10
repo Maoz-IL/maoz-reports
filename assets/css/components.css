@@ -31,13 +31,18 @@
   border-color: var(--color-error-1);
 
   padding: 0.1rem 0.5rem;
-  border-radius: var(--border-radius-m);
+  border-radius: var(--border-radius-s);
 }
 
 .btn-cancel #x-mark {
   font-size: 1rem;
   margin-left: 1px;
   transform: translateY(-0.5px);
+}
+
+.btn-disabled {
+  color: var(--color-nutral-1);
+  background-color: var(--color-nutral-2);
 }
 
 /* ======
@@ -77,4 +82,44 @@ footer {
   z-index: 1;
 
   background-color: inherit;
+}
+
+.footer-button-next {
+  width: 100%;
+  padding: 1rem 0;
+}
+
+.footer-stage-indicator {
+  display: flex;
+  justify-content: center;
+
+  margin: 1rem 0;
+}
+
+.footer-stage-indicator li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  margin: 0 2px;
+}
+
+.footer-stage-indicator-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+
+  border-radius: 5rem;
+
+  background-color: var(--color-nutral-2);
+}
+
+.footer-stage-indicator li.current .footer-stage-indicator-dot {
+  background-color: var(--color-primary-1);
+}
+
+.footer-stage-indicator-complete svg {
+  width: 1rem;
+  fill: var(--color-primary-1);
+
+  opacity: 0;
 }
