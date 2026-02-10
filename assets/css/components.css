@@ -25,12 +25,12 @@
 }
 
 .btn-cancel {
-  font-size: 1rem;
+  font-size: 0.85rem;
 
   color: var(--color-error-1);
   border-color: var(--color-error-1);
 
-  padding: 0.25rem 0.75rem;
+  padding: 0.1rem 0.5rem;
   border-radius: var(--border-radius-m);
 }
 
@@ -47,6 +47,7 @@
 header {
   position: sticky;
   top: 0;
+  z-index: 1;
 
   background-color: inherit;
 }
@@ -73,6 +74,7 @@ header {
 footer {
   position: sticky;
   bottom: 0;
+  z-index: 1;
 
   background-color: inherit;
 }

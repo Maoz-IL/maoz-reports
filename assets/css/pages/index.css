@@ -4,5 +4,50 @@
 @import url('/assets/css/components.css');
 
 body {
+  color: var(--color-primary-1);
   background-color: var(--color-light-2);
+}
+
+.main-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-weight: 700;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.main-title p {
+  font-size: 0.75rem;
+  opacity: 70%;
+}
+
+.main-title p span {
+  color: var(--color-error-1);
+}
+
+.main-title-stage-indicator {
+  --height: 1.75rem;
+
+  width: 1.5rem;
+  height: var(--height);
+  overflow: hidden;
+
+  font-size: 0.8rem;
+  text-align: center;
+  color: var(--color-light-2);
+  background-color: var(--color-primary-1);
+  border-radius: var(--border-radius-s);
+
+  opacity: 70%;
+}
+
+.main-title-stage-indicator li {
+  height: var(--height);
+  display: grid;
+  align-items: center;
 }
