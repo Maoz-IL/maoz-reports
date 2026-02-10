@@ -40,7 +40,8 @@
   transform: translateY(-0.5px);
 }
 
-.btn-disabled {
+.btn[disabled] {
+  cursor: default;
   color: var(--color-nutral-1);
   background-color: var(--color-nutral-2);
 }
@@ -102,7 +103,7 @@ footer {
   display: none;
 }
 
-.footer-button-next:not(.btn-disabled) {
+.footer-button-next:not([disabled]) {
   color: var(--color-light-1);
   background-color: var(--color-primary-1);
 }
