@@ -94,12 +94,38 @@ footer {
   background-color: inherit;
 }
 
-.footer-button-next {
-  width: 100%;
-  padding: 1rem 0;
+.footer-button-group {
+  display: grid;
 }
 
-.footer-button-next .complete {
+.footer-button-group button {
+  grid-area: 1/1;
+}
+
+.footer-button-prev {
+  width: 15%;
+
+  color: var(--color-primary-1);
+  background-color: var(--color-light-2);
+  border-color: var(--color-primary-1);
+}
+
+.footer-button-prev svg {
+  width: 25%;
+  fill: var(--color-primary-1);
+  transform: rotate(180deg);
+}
+
+.footer-button-next {
+  justify-self: end;
+
+  width: 100%;
+  padding: 1rem 0;
+
+  transition: width 700ms ease;
+}
+
+.footer-button-next .incomplete {
   display: none;
 }
 
