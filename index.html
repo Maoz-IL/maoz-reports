@@ -175,10 +175,12 @@
             <p>השדות המסומנים ב־ <span>*</span> הם שדות חובה</p>
           </div>
           <ol class="main-title-stage-indicator">
-            <li>1</li>
-            <li>2</li>
-            <li>3</li>
-            <li>4</li>
+            <div class="container">
+              <li>1</li>
+              <li>2</li>
+              <li>3</li>
+              <li>4</li>
+            </div>
           </ol>
         </div>
         <form action="POST">
@@ -209,16 +211,13 @@
     <footer>
       <div class="wrapper footer-wrapper">
         <div class="footer-button-group">
-          <button
-            class="footer-button-next btn"
-            disabled
-          >
+          <button class="footer-button-next btn">
             <span class="incomplete">מלא את הטופס כדי להמשיך</span>
             <span class="complete">המשך</span>
           </button>
         </div>
         <ol class="footer-stage-indicator">
-          <li class="current">
+          <li class="current-step">
             <div class="footer-stage-indicator-dot"></div>
             <div class="footer-stage-indicator-complete">
               <svg

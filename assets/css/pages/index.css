@@ -35,7 +35,6 @@ h1 {
 
   width: 1.5rem;
   height: var(--height);
-  overflow: hidden;
 
   font-size: 0.8rem;
   text-align: center;
@@ -44,6 +43,11 @@ h1 {
   border-radius: var(--border-radius-s);
 
   opacity: 70%;
+}
+
+.main-title-stage-indicator .container {
+  /* overflow: hidden; */
+  transition: transform 700ms ease;
 }
 
 .main-title-stage-indicator li {

@@ -132,7 +132,7 @@ footer {
   background-color: var(--color-nutral-2);
 }
 
-.footer-stage-indicator li.current .footer-stage-indicator-dot {
+.footer-stage-indicator li.current-step .footer-stage-indicator-dot {
   background-color: var(--color-primary-1);
 }
 
