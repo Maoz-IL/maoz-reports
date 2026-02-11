@@ -40,7 +40,7 @@
   transform: translateY(-0.5px);
 }
 
-.btn[disabled] {
+.btn:disabled {
   cursor: default;
   color: var(--color-nutral-1);
   background-color: var(--color-nutral-2);
@@ -103,7 +103,7 @@ footer {
   display: none;
 }
 
-.footer-button-next:not([disabled]) {
+.footer-button-next:not(:disabled) {
   color: var(--color-light-1);
   background-color: var(--color-primary-1);
 }
@@ -151,11 +151,19 @@ form .steps {
   display: grid;
 }
 
-form .steps div {
+form .steps fieldset {
+  --opacity: 30%;
+
   grid-area: 1 / 1;
 
   font-size: 20rem;
   font-weight: 800;
-  opacity: 0.3;
   text-align: center;
+
+  opacity: var(--opacity);
+  transition: opacity 300ms ease;
+}
+
+form .steps fieldset:not(.current-step) {
+  opacity: 0;
 }
