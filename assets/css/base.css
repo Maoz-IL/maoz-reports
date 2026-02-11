@@ -20,6 +20,20 @@ body {
   overflow-x: hidden;
 }
 
+fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+
+legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 input,
 textarea,
 button,
