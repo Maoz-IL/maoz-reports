@@ -8,10 +8,16 @@ const footerStageIndicator = [...document.querySelectorAll('.footer-stage-indica
 const btnPrev = document.querySelector('.footer-button-prev');
 const btnNext = document.querySelector('.footer-button-next');
 
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+};
+
 let currentStep = formSteps.findIndex((step) => step.classList.contains('current-step'));
 
 btnNext.addEventListener('click', () => {
   if (currentStep < formSteps.length - 1) {
+    scrollToTop();
+
     formSteps[currentStep].classList.remove('current-step');
 
     currentStep += 1;
@@ -27,6 +33,8 @@ btnNext.addEventListener('click', () => {
 
 btnPrev.addEventListener('click', () => {
   if (currentStep > 0) {
+    scrollToTop();
+
     // הסר מצב נוכחי מהשלב הנוכחי
     formSteps[currentStep].classList.remove('current-step');
     footerStageIndicator[currentStep].classList.remove('current-step');

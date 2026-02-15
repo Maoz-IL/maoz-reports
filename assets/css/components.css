@@ -182,14 +182,79 @@ form .steps fieldset {
 
   grid-area: 1 / 1;
 
-  font-size: 20rem;
+  display: grid;
+  row-gap: 2rem;
+
   font-weight: 800;
   text-align: center;
 
-  opacity: var(--opacity);
   transition: opacity 300ms ease;
+}
+
+form .steps fieldset:not(:first-of-type) {
+  font-size: 20rem;
+  opacity: var(--opacity);
 }
 
 form .steps fieldset:not(.current-step) {
   opacity: 0;
+  pointer-events: none;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
+.form-label {
+  text-wrap: nowrap;
+  margin-bottom: 0.25rem;
+}
+
+.form-label-asterisk {
+  display: none;
+}
+
+.form-label-required .form-label-asterisk {
+  display: inline-block;
+  color: var(--color-error-1);
+  transform: translateX(1.5px);
+}
+
+.form-control,
+.form-input {
+  width: 100%;
+}
+
+.form-control {
+  position: relative;
+}
+
+.form-input {
+  font-weight: 700;
+  color: var(--color-primary-1);
+  background-color: var(--color-light-3);
+
+  padding: 0.65rem 1.25rem;
+  border-bottom: 2.5px solid var(--color-nutral-1);
+  border-top-right-radius: var(--border-radius-m);
+  border-top-left-radius: var(--border-radius-m);
+}
+
+.form-input-icon {
+  position: absolute;
+  top: 50%;
+  left: 1.25rem;
+
+  transform: translateY(-50%);
+}
+
+.form-input-icon svg {
+  width: 1rem;
+}
+
+.form-input-icon svg path {
+  fill: var(--color-nutral-1);
+  stroke: var(--color-nutral-1);
 }
