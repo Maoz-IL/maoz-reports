@@ -87,7 +87,7 @@ header {
    ====== */
 
 footer {
-  position: sticky;
+  position: fixed;
   bottom: 0;
   z-index: 1;
 
@@ -111,7 +111,7 @@ footer {
 }
 
 .footer-button-prev svg {
-  width: 25%;
+  width: 0.65rem;
   fill: var(--color-primary-1);
   transform: rotate(180deg);
 }
