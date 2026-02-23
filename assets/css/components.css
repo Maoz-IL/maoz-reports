@@ -182,7 +182,8 @@ form .steps fieldset {
 
   grid-area: 1 / 1;
 
-  display: grid;
+  display: flex;
+  flex-direction: column;
   row-gap: 2rem;
 
   font-weight: 800;
@@ -243,6 +244,8 @@ form .steps fieldset:not(.current-step) {
 }
 
 .form-input-icon {
+  pointer-events: none;
+
   position: absolute;
   top: 50%;
   left: 1.25rem;
@@ -254,7 +257,16 @@ form .steps fieldset:not(.current-step) {
   width: 1rem;
 }
 
+.form-input-icon-date svg {
+  width: 1.2rem;
+}
+
 .form-input-icon svg path {
   fill: var(--color-nutral-1);
   stroke: var(--color-nutral-1);
+}
+
+input[type='date']::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
 }

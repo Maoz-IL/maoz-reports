@@ -57,3 +57,17 @@ btnPrev.addEventListener('click', () => {
     }
   }
 });
+
+const inputDate = document.querySelectorAll('input[type="date"]');
+
+document.addEventListener('DOMContentLoaded', () => {
+  const now = new Date();
+  const yyyy = String(now.getFullYear());
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const today = `${yyyy}-${mm}-${dd}`;
+
+  inputDate.forEach((field) => {
+    if (!field.value) field.value = today;
+  });
+});
