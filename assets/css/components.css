@@ -233,6 +233,8 @@ form .steps fieldset:not(.current-step) {
 }
 
 .form-input {
+  min-height: 3rem;
+
   font-weight: 700;
   color: var(--color-primary-1);
   background-color: var(--color-light-3);
@@ -266,7 +268,61 @@ form .steps fieldset:not(.current-step) {
   stroke: var(--color-nutral-1);
 }
 
+input[type='date'] {
+  width: 100%;
+  max-width: 100%;
+  display: block;
+
+  -webkit-appearance: none;
+  appearance: none;
+
+  min-width: 0;
+}
+
 input[type='date']::-webkit-calendar-picker-indicator {
   opacity: 0;
   cursor: pointer;
+}
+
+/* ========== */
+
+.form-input-select {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.form-input-select-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+
+  overflow: hidden;
+
+  font-weight: 700;
+  background: var(--color-light-3);
+  border: 2px solid var(--color-nutral-2);
+  border-bottom-right-radius: var(--border-radius-m);
+  border-bottom-left-radius: var(--border-radius-m);
+
+  box-shadow: 0 1rem 0.75rem rgba(0, 0, 0, 0.12);
+}
+
+.form-input-select-menu-option {
+  cursor: pointer;
+  text-align: right;
+  padding: 0.65rem 1.75rem;
+}
+
+.form-input-select-menu-option:hover,
+.form-input-select-menu-option[aria-selected='true'],
+.form-input-select-menu-option.is-active {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.form-input-select-menu-option[aria-selected='true'] {
+  color: var(--color-light-2);
+  background-color: var(--color-primary-1);
 }

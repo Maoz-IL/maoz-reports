@@ -71,3 +71,133 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!field.value) field.value = today;
   });
 });
+
+// ===================
+
+function initCustomSelect(root) {
+  const combobox = root.querySelector('[role="combobox"]');
+  const listbox = root.querySelector('[role="listbox"]');
+  const valueEl = root.querySelector('[data-select-value]');
+  const hiddenInput = root.querySelector('input[type="hidden"]');
+  const options = Array.from(root.querySelectorAll('[role="option"]'));
+
+  let activeIndex = -1;
+
+  const isOpen = () => combobox.getAttribute('aria-expanded') === 'true';
+
+  const open = () => {
+    combobox.setAttribute('aria-expanded', 'true');
+    listbox.hidden = false;
+
+    // קבע active לאופציה נבחרת אם קיימת, אחרת ראשונה
+    const selectedIndex = options.findIndex(
+      (o) => o.getAttribute('aria-selected') === 'true',
+    );
+    activeIndex = selectedIndex >= 0 ? selectedIndex : 0;
+    setActive(activeIndex);
+
+    // פוקוס נשאר על הכפתור; אנחנו רק מדגישים אופציה
+  };
+
+  const close = () => {
+    combobox.setAttribute('aria-expanded', 'false');
+    listbox.hidden = true;
+    clearActive();
+    activeIndex = -1;
+  };
+
+  const toggle = () => (isOpen() ? close() : open());
+
+  const setSelected = (opt) => {
+    options.forEach((o) => o.setAttribute('aria-selected', 'false'));
+    opt.setAttribute('aria-selected', 'true');
+
+    const label = opt.textContent.trim();
+    const value = opt.dataset.value ?? label;
+
+    valueEl.textContent = label;
+    hiddenInput.value = value;
+
+    close();
+    combobox.focus();
+  };
+
+  const setActive = (index) => {
+    options.forEach((o) => o.classList.remove('is-active'));
+    const opt = options[index];
+    if (!opt) return;
+    opt.classList.add('is-active');
+
+    // גלילה פנימית אם צריך
+    opt.scrollIntoView({ block: 'nearest' });
+  };
+
+  const clearActive = () => {
+    options.forEach((o) => o.classList.remove('is-active'));
+  };
+
+  const moveActive = (dir) => {
+    if (!isOpen()) open();
+    const next = Math.max(0, Math.min(options.length - 1, activeIndex + dir));
+    activeIndex = next;
+    setActive(activeIndex);
+  };
+
+  // Clicks
+  combobox.addEventListener('click', toggle);
+
+  options.forEach((opt, idx) => {
+    opt.addEventListener('click', () => setSelected(opt));
+    opt.addEventListener('mousemove', () => {
+      if (!isOpen()) return;
+      activeIndex = idx;
+      setActive(activeIndex);
+    });
+  });
+
+  // Keyboard on combobox
+  combobox.addEventListener('keydown', (e) => {
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        moveActive(+1);
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        moveActive(-1);
+        break;
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        if (!isOpen()) open();
+        else if (activeIndex >= 0) setSelected(options[activeIndex]);
+        break;
+      case 'Escape':
+        if (isOpen()) {
+          e.preventDefault();
+          close();
+        }
+        break;
+      case 'Tab':
+        // תן לטאב לצאת, אבל סגור לפני
+        close();
+        break;
+    }
+  });
+
+  // Close when clicking outside
+  document.addEventListener('pointerdown', (e) => {
+    if (!root.contains(e.target)) close();
+  });
+
+  // אם תרצה placeholder אמיתי כשהערך ריק:
+  const placeholder = combobox.dataset.placeholder || '‎';
+  if (!hiddenInput.value) valueEl.textContent = placeholder;
+}
+
+// הפעלה לכל select כזה בדף:
+document.querySelectorAll('.form-field').forEach((field) => {
+  if (field.querySelector('[role="combobox"][aria-controls]')) {
+    initCustomSelect(field);
+  }
+});
