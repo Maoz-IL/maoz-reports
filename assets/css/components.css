@@ -233,13 +233,15 @@ form .steps fieldset:not(.current-step) {
 }
 
 .form-input {
-  min-height: 3rem;
+  min-height: 3.5rem;
 
   font-weight: 700;
+  text-align: right;
+  line-height: 3.5rem;
   color: var(--color-primary-1);
   background-color: var(--color-light-3);
 
-  padding: 0.65rem 1.25rem;
+  padding: 0 1.25rem;
   border-bottom: 2.5px solid var(--color-nutral-1);
   border-top-right-radius: var(--border-radius-m);
   border-top-left-radius: var(--border-radius-m);
@@ -270,13 +272,12 @@ form .steps fieldset:not(.current-step) {
 
 input[type='date'] {
   width: 100%;
+  min-width: 0;
   max-width: 100%;
   display: block;
 
   -webkit-appearance: none;
   appearance: none;
-
-  min-width: 0;
 }
 
 input[type='date']::-webkit-calendar-picker-indicator {
@@ -291,6 +292,19 @@ input[type='date']::-webkit-calendar-picker-indicator {
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
+}
+
+.form-input-select-value-group,
+.form-input-select-menu-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-input-select-img,
+.form-input-select-menu-option .option-image {
+  width: 2rem;
+  border-radius: var(--border-radius-s);
 }
 
 .form-input-select-menu {

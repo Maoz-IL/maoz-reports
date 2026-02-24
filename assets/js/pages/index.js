@@ -1,3 +1,5 @@
+import { workers } from '../data/workers.js';
+
 const formSteps = [...document.querySelectorAll('form fieldset')];
 const titleStageIndicator = document.querySelector(
   '.main-title-stage-indicator .container',
@@ -58,6 +60,8 @@ btnPrev.addEventListener('click', () => {
   }
 });
 
+// ===================
+
 const inputDate = document.querySelectorAll('input[type="date"]');
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -74,10 +78,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ===================
 
+const teamHeadSelectMenu = document.querySelector('.form-input-select-menu');
+
+function renderSelectOptions(menuEl, options) {
+  const frag = document.createDocumentFragment();
+
+  options.forEach(({ value, label, img, alt }) => {
+    const li = document.createElement('li');
+
+    li.className = 'form-input-select-menu-option';
+    li.setAttribute('role', 'option');
+    li.setAttribute('tabindex', '-1');
+
+    li.dataset.value = value;
+    li.dataset.img = img;
+    li.dataset.alt = alt;
+
+    li.innerHTML = `
+      <img class="option-image" src="${img}" alt="${alt}" loading="lazy" decoding="async">
+      <span class="option-text">${label}</span>
+    `;
+
+    frag.appendChild(li);
+  });
+
+  menuEl.appendChild(frag);
+}
+
+renderSelectOptions(teamHeadSelectMenu, workers);
+
 function initCustomSelect(root) {
   const combobox = root.querySelector('[role="combobox"]');
   const listbox = root.querySelector('[role="listbox"]');
   const valueEl = root.querySelector('[data-select-value]');
+  const imgEl = root.querySelector('[data-select-img]');
   const hiddenInput = root.querySelector('input[type="hidden"]');
   const options = Array.from(root.querySelectorAll('[role="option"]'));
 
@@ -117,6 +151,21 @@ function initCustomSelect(root) {
 
     valueEl.textContent = label;
     hiddenInput.value = value;
+
+    if (imgEl) {
+      const src = opt.dataset.img;
+      const alt = opt.dataset.alt;
+      if (src) {
+        imgEl.src = src;
+        imgEl.alt = alt;
+        imgEl.decoding = 'async';
+        imgEl.removeAttribute('hidden');
+      } else {
+        imgEl.removeAttribute('src');
+        imgEl.alt = '';
+        imgEl.setAttribute('hidden', '');
+      }
+    }
 
     close();
     combobox.focus();
@@ -190,7 +239,6 @@ function initCustomSelect(root) {
     if (!root.contains(e.target)) close();
   });
 
-  // אם תרצה placeholder אמיתי כשהערך ריק:
   const placeholder = combobox.dataset.placeholder || '‎';
   if (!hiddenInput.value) valueEl.textContent = placeholder;
 }

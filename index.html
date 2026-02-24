@@ -48,7 +48,7 @@
 
     <!-- CSS & JS -->
     <link rel="stylesheet" href="/assets/css/pages/index.css" />
-    <script defer src="/assets/js/pages/index.js"></script>
+    <script defer type="module" src="/assets/js/pages/index.js"></script>
   </head>
   <body>
     <header>
@@ -149,7 +149,7 @@
               <!-- שם המדווח -->
               <div class="form-field" data-field="">
                 <label class="form-label form-label-required" for="">
-                  שם המדווח
+                  ראש הצוות
                   <span class="form-label-asterisk">*</span>
                 </label>
 
@@ -168,7 +168,10 @@
                     aria-controls="teamHead-listbox"
                     aria-labelledby="teamHead-combobox"
                   >
-                    <span class="form-select-value" data-select-value></span>
+                    <span class="form-input-select-value-group">
+                      <img class="form-input-select-img" data-select-img />
+                      <span class="form-input-select-value" data-select-value></span>
+                    </span>
                     <span class="form-input-icon" aria-hidden="true">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                         <path
@@ -185,32 +188,7 @@
                     role="listbox"
                     tabindex="-1"
                     hidden
-                  >
-                    <li
-                      class="form-input-select-menu-option"
-                      role="option"
-                      data-value="pruning"
-                      tabindex="-1"
-                    >
-                      אפשרות 1
-                    </li>
-                    <li
-                      class="form-input-select-menu-option"
-                      role="option"
-                      data-value="planting"
-                      tabindex="-1"
-                    >
-                      אפשרות 2
-                    </li>
-                    <li
-                      class="form-input-select-menu-option"
-                      role="option"
-                      data-value="treatment"
-                      tabindex="-1"
-                    >
-                      אפשרות 3
-                    </li>
-                  </ul>
+                  ></ul>
                 </div>
               </div>
               <!-- חברי הצוות -->
