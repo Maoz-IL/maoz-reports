@@ -295,7 +295,7 @@ input[type='date']::-webkit-calendar-picker-indicator {
 }
 
 .form-input-select-value-group,
-.form-input-select-menu-option {
+.option-image-text-group {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -308,12 +308,13 @@ input[type='date']::-webkit-calendar-picker-indicator {
 }
 
 .form-input-select-menu {
+  max-height: 25svh;
+  overflow-y: scroll;
+
   position: absolute;
   left: 0;
   right: 0;
   z-index: 1;
-
-  overflow: hidden;
 
   font-weight: 700;
   background: var(--color-light-3);
@@ -321,10 +322,14 @@ input[type='date']::-webkit-calendar-picker-indicator {
   border-bottom-right-radius: var(--border-radius-m);
   border-bottom-left-radius: var(--border-radius-m);
 
-  box-shadow: 0 1rem 0.75rem rgba(0, 0, 0, 0.12);
+  box-shadow: var(--box-shadow-1);
 }
 
 .form-input-select-menu-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
   cursor: pointer;
   text-align: right;
   padding: 0.65rem 1.75rem;
@@ -339,4 +344,9 @@ input[type='date']::-webkit-calendar-picker-indicator {
 .form-input-select-menu-option[aria-selected='true'] {
   color: var(--color-light-2);
   background-color: var(--color-primary-1);
+}
+
+.option-role {
+  font-size: 0.75rem;
+  font-weight: 400;
 }

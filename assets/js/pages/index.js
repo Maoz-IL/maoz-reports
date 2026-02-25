@@ -78,12 +78,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ===================
 
-const teamHeadSelectMenu = document.querySelector('.form-input-select-menu');
+const teamLeadSelectMenu = document.querySelector('.form-input-select-menu');
+const teamLeadRoles = new Set(['מנהל פרויקט', 'ראש צוות', 'קבלן']);
+const teamLeadsFilter = workers.filter((w) => teamLeadRoles.has(w.role));
 
 function renderSelectOptions(menuEl, options) {
   const frag = document.createDocumentFragment();
 
-  options.forEach(({ value, label, img, alt }) => {
+  options.forEach(({ value, label, role, img, alt }) => {
     const li = document.createElement('li');
 
     li.className = 'form-input-select-menu-option';
@@ -91,12 +93,17 @@ function renderSelectOptions(menuEl, options) {
     li.setAttribute('tabindex', '-1');
 
     li.dataset.value = value;
+    li.dataset.label = label;
+    li.dataset.role = role;
     li.dataset.img = img;
     li.dataset.alt = alt;
 
     li.innerHTML = `
+    <span class="option-image-text-group">
       <img class="option-image" src="${img}" alt="${alt}" loading="lazy" decoding="async">
       <span class="option-text">${label}</span>
+    </span>
+    <span class="option-role">${role}</span>
     `;
 
     frag.appendChild(li);
@@ -105,13 +112,15 @@ function renderSelectOptions(menuEl, options) {
   menuEl.appendChild(frag);
 }
 
-renderSelectOptions(teamHeadSelectMenu, workers);
+renderSelectOptions(teamLeadSelectMenu, teamLeadsFilter);
 
 function initCustomSelect(root) {
   const combobox = root.querySelector('[role="combobox"]');
   const listbox = root.querySelector('[role="listbox"]');
-  const valueEl = root.querySelector('[data-select-value]');
+
   const imgEl = root.querySelector('[data-select-img]');
+  const valueEl = root.querySelector('[data-select-value]');
+
   const hiddenInput = root.querySelector('input[type="hidden"]');
   const options = Array.from(root.querySelectorAll('[role="option"]'));
 
@@ -146,18 +155,17 @@ function initCustomSelect(root) {
     options.forEach((o) => o.setAttribute('aria-selected', 'false'));
     opt.setAttribute('aria-selected', 'true');
 
-    const label = opt.textContent.trim();
-    const value = opt.dataset.value ?? label;
+    const value = opt.dataset.value;
+    if (!value) return;
 
-    valueEl.textContent = label;
+    valueEl.textContent = value;
     hiddenInput.value = value;
 
     if (imgEl) {
       const src = opt.dataset.img;
-      const alt = opt.dataset.alt;
       if (src) {
         imgEl.src = src;
-        imgEl.alt = alt;
+        imgEl.alt = '';
         imgEl.decoding = 'async';
         imgEl.removeAttribute('hidden');
       } else {

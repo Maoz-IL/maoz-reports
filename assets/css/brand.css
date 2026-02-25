@@ -13,6 +13,8 @@
 
   --color-error-1: #e27e6a;
 
+  --color-shadow-1: rgba(0, 0, 0, 0.12);
+
   /* ===============
      Gradient Colors
      =============== */
@@ -29,6 +31,11 @@
   --border-radius-l: 0.75rem;
   --border-radius-m: 0.5rem;
   --border-radius-s: 0.25rem;
+
+  /* =======
+     Shadows
+     ======= */
+  --box-shadow-1: 0 1rem 0.75rem var(--color-shadow-1);
 
   /* ======
      Layout
