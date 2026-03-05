@@ -90,11 +90,30 @@ function initSelectBase(root) {
 
   let activeIndex = -1;
 
+  const scrollMenuFullyIntoView = (gap = 16) => {
+    requestAnimationFrame(() => {
+      const rect = listbox.getBoundingClientRect();
+      const vh = window.innerHeight;
+
+      // כמה "יוצא" מהמסך למטה / למעלה
+      const overflowBottom = rect.bottom - (vh - gap);
+      const overflowTop = gap - rect.top;
+
+      if (overflowBottom > 0) {
+        window.scrollBy({ top: overflowBottom, behavior: 'smooth' });
+      } else if (overflowTop > 0) {
+        window.scrollBy({ top: -overflowTop, behavior: 'smooth' });
+      }
+    });
+  };
+
   const isOpen = () => combobox.getAttribute('aria-expanded') === 'true';
 
   const open = () => {
     combobox.setAttribute('aria-expanded', 'true');
     listbox.hidden = false;
+
+    scrollMenuFullyIntoView(16);
 
     const opts = options();
     const selectedIndex = opts.findIndex(
