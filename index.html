@@ -146,21 +146,19 @@
                   </span>
                 </div>
               </div>
-              <!-- שם המדווח -->
+              <!-- ראש הצוות -->
               <div class="form-field" data-field="">
                 <label class="form-label form-label-required" for="">
                   ראש הצוות
                   <span class="form-label-asterisk">*</span>
                 </label>
-
                 <div class="form-control">
                   <!-- האינפוט המוסתר שנשלח בפועל בטופס -->
                   <input type="hidden" name="teamLead" id="teamLead" required />
-
                   <!-- ה"משטח" שנלחץ כדי לפתוח -->
                   <button
                     type="button"
-                    class="form-input form-input-select"
+                    class="form-input form-input-select form-input-select-single"
                     id="teamLead"
                     role="combobox"
                     aria-haspopup="listbox"
@@ -180,11 +178,10 @@
                       </svg>
                     </span>
                   </button>
-
                   <!-- תפריט בחירה -->
                   <ul
-                    class="form-input-select-menu"
-                    id="serviceType-listbox"
+                    class="form-input-select-menu form-input-select-single-menu form-input-select-menu-teamLead"
+                    id="teamLead-listbox"
                     role="listbox"
                     tabindex="-1"
                     hidden
@@ -192,79 +189,93 @@
                 </div>
               </div>
               <!-- חברי הצוות -->
-              <div class="form-field" data-field="">
-                <label class="form-label form-label-required" for="fullName">
+              <div
+                class="form-field"
+                data-multi-singular="חבר צוות"
+                data-multi-plural="חברי צוות"
+              >
+                <label class="form-label form-label-required" for="">
                   חברי הצוות
                   <span class="form-label-asterisk">*</span>
                 </label>
                 <div class="form-control">
-                  <input
-                    type="text"
-                    id=""
-                    name=""
-                    class="form-input"
-                    autocomplete=""
-                    aria-describedby=""
-                    aria-invalid=""
-                    required
-                  />
-                  <span class="form-input-icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                      <path
-                        d="M240 192C240 147.8 275.8 112 320 112C364.2 112 400 147.8 400 192C400 236.2 364.2 272 320 272C275.8 272 240 236.2 240 192zM448 192C448 121.3 390.7 64 320 64C249.3 64 192 121.3 192 192C192 262.7 249.3 320 320 320C390.7 320 448 262.7 448 192zM144 544C144 473.3 201.3 416 272 416L368 416C438.7 416 496 473.3 496 544L496 552C496 565.3 506.7 576 520 576C533.3 576 544 565.3 544 552L544 544C544 446.8 465.2 368 368 368L272 368C174.8 368 96 446.8 96 544L96 552C96 565.3 106.7 576 120 576C133.3 576 144 565.3 144 552L144 544z"
-                      />
-                    </svg>
-                  </span>
+                  <!-- האינפוט המוסתר שנשלח בפועל בטופס -->
+                  <input type="hidden" name="teamMembers" id="teamMembers" required />
+                  <!-- ה"משטח" שנלחץ כדי לפתוח -->
+                  <button
+                    type="button"
+                    class="form-input form-input-select form-input-select-multi"
+                    id="teamMembers"
+                    role="combobox"
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                    aria-controls="teamMembers-listbox"
+                    aria-labelledby="teamMembers-combobox"
+                  >
+                    <span class="form-input-select-value" data-select-value></span>
+                    <span class="form-input-icon" aria-hidden="true">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                        <path
+                          d="M240 192C240 147.8 275.8 112 320 112C364.2 112 400 147.8 400 192C400 236.2 364.2 272 320 272C275.8 272 240 236.2 240 192zM448 192C448 121.3 390.7 64 320 64C249.3 64 192 121.3 192 192C192 262.7 249.3 320 320 320C390.7 320 448 262.7 448 192zM144 544C144 473.3 201.3 416 272 416L368 416C438.7 416 496 473.3 496 544L496 552C496 565.3 506.7 576 520 576C533.3 576 544 565.3 544 552L544 544C544 446.8 465.2 368 368 368L272 368C174.8 368 96 446.8 96 544L96 552C96 565.3 106.7 576 120 576C133.3 576 144 565.3 144 552L144 544z"
+                        />
+                      </svg>
+                    </span>
+                  </button>
+                  <!-- תפריט בחירה -->
+                  <ul
+                    class="form-input-select-menu form-input-select-multi-menu form-input-select-menu-teamMembers"
+                    id="teamMembers-listbox"
+                    role="listbox"
+                    tabindex="-1"
+                    hidden
+                  ></ul>
+                  <!-- האפשרויות שנבחרו -->
+                  <ul class="form-input-select-multi-chosen"></ul>
                 </div>
               </div>
-              <div class="form-field" data-field="">
-                <label class="form-label form-label-required" for="fullName">
-                  לקוח
+              <!-- כלי רכב -->
+              <div
+                class="form-field"
+                data-multi-singular="כלי רכב"
+                data-multi-plural="כלי רכב"
+              >
+                <label class="form-label form-label-required" for="">
+                  כלי רכב
                   <span class="form-label-asterisk">*</span>
                 </label>
                 <div class="form-control">
-                  <input
-                    type="text"
-                    id=""
-                    name=""
-                    class="form-input"
-                    autocomplete=""
-                    aria-describedby=""
-                    aria-invalid=""
-                    required
-                  />
-                  <span class="form-input-icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                      <path
-                        d="M240 192C240 147.8 275.8 112 320 112C364.2 112 400 147.8 400 192C400 236.2 364.2 272 320 272C275.8 272 240 236.2 240 192zM448 192C448 121.3 390.7 64 320 64C249.3 64 192 121.3 192 192C192 262.7 249.3 320 320 320C390.7 320 448 262.7 448 192zM144 544C144 473.3 201.3 416 272 416L368 416C438.7 416 496 473.3 496 544L496 552C496 565.3 506.7 576 520 576C533.3 576 544 565.3 544 552L544 544C544 446.8 465.2 368 368 368L272 368C174.8 368 96 446.8 96 544L96 552C96 565.3 106.7 576 120 576C133.3 576 144 565.3 144 552L144 544z"
-                      />
-                    </svg>
-                  </span>
-                </div>
-              </div>
-              <div class="form-field" data-field="">
-                <label class="form-label form-label-required" for="fullName">
-                  כתובת
-                  <span class="form-label-asterisk">*</span>
-                </label>
-                <div class="form-control">
-                  <input
-                    type="text"
-                    id=""
-                    name=""
-                    class="form-input"
-                    autocomplete=""
-                    aria-describedby=""
-                    aria-invalid=""
-                    required
-                  />
-                  <span class="form-input-icon" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
-                      <path
-                        d="M240 192C240 147.8 275.8 112 320 112C364.2 112 400 147.8 400 192C400 236.2 364.2 272 320 272C275.8 272 240 236.2 240 192zM448 192C448 121.3 390.7 64 320 64C249.3 64 192 121.3 192 192C192 262.7 249.3 320 320 320C390.7 320 448 262.7 448 192zM144 544C144 473.3 201.3 416 272 416L368 416C438.7 416 496 473.3 496 544L496 552C496 565.3 506.7 576 520 576C533.3 576 544 565.3 544 552L544 544C544 446.8 465.2 368 368 368L272 368C174.8 368 96 446.8 96 544L96 552C96 565.3 106.7 576 120 576C133.3 576 144 565.3 144 552L144 544z"
-                      />
-                    </svg>
-                  </span>
+                  <!-- האינפוט המוסתר שנשלח בפועל בטופס -->
+                  <input type="hidden" name="vehicles" id="vehicles" required />
+                  <!-- ה"משטח" שנלחץ כדי לפתוח -->
+                  <button
+                    type="button"
+                    class="form-input form-input-select form-input-select-multi"
+                    id="vehicles"
+                    role="combobox"
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                    aria-controls="vehicles-listbox"
+                    aria-labelledby="vehicles-combobox"
+                  >
+                    <span class="form-input-select-value" data-select-value></span>
+                    <span class="form-input-icon" aria-hidden="true">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                        <path
+                          d="M240 192C240 147.8 275.8 112 320 112C364.2 112 400 147.8 400 192C400 236.2 364.2 272 320 272C275.8 272 240 236.2 240 192zM448 192C448 121.3 390.7 64 320 64C249.3 64 192 121.3 192 192C192 262.7 249.3 320 320 320C390.7 320 448 262.7 448 192zM144 544C144 473.3 201.3 416 272 416L368 416C438.7 416 496 473.3 496 544L496 552C496 565.3 506.7 576 520 576C533.3 576 544 565.3 544 552L544 544C544 446.8 465.2 368 368 368L272 368C174.8 368 96 446.8 96 544L96 552C96 565.3 106.7 576 120 576C133.3 576 144 565.3 144 552L144 544z"
+                        />
+                      </svg>
+                    </span>
+                  </button>
+                  <!-- תפריט בחירה -->
+                  <ul
+                    class="form-input-select-menu form-input-select-multi-menu form-input-select-menu-vehicles"
+                    id="vehicles-listbox"
+                    role="listbox"
+                    tabindex="-1"
+                    hidden
+                  ></ul>
+                  <!-- האפשרויות שנבחרו -->
+                  <ul class="form-input-select-multi-chosen"></ul>
                 </div>
               </div>
             </fieldset>

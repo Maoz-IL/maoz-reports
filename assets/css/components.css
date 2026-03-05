@@ -251,7 +251,7 @@ form .steps fieldset:not(.current-step) {
   pointer-events: none;
 
   position: absolute;
-  top: 50%;
+  top: 1.82rem;
   left: 1.25rem;
 
   transform: translateY(-50%);
@@ -294,6 +294,10 @@ input[type='date']::-webkit-calendar-picker-indicator {
   cursor: pointer;
 }
 
+fieldset .form-field:last-of-type:has(.form-input-select[aria-expanded='true']) {
+  margin-bottom: 25svh;
+}
+
 .form-input-select-value-group,
 .option-image-text-group {
   display: flex;
@@ -302,7 +306,7 @@ input[type='date']::-webkit-calendar-picker-indicator {
 }
 
 .form-input-select-img,
-.form-input-select-menu-option .option-image {
+.option-image {
   width: 2rem;
   border-radius: var(--border-radius-s);
 }
@@ -349,4 +353,33 @@ input[type='date']::-webkit-calendar-picker-indicator {
 .option-role {
   font-size: 0.75rem;
   font-weight: 400;
+}
+
+.form-input-select-multi-chosen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.form-input-select-multi-chosen:has(li) {
+  margin-top: 1rem;
+}
+
+.form-input-select-chip {
+  width: fit-content;
+
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  font-size: 0.9rem;
+  color: var(--color-nutral-1);
+
+  padding: 0.5rem 0.75rem;
+  background-color: var(--color-light-3);
+  border-radius: var(--border-radius-s);
+}
+
+.form-input-select-chip-img {
+  width: 1.5rem;
 }
