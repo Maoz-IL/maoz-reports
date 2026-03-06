@@ -299,7 +299,20 @@ function initMultiSelect(root) {
       li.innerHTML = `
         ${imgHtml}
         <span class="form-input-select-chip-label">${meta.label}</span>
-        <button type="button" aria-label="הסר ${meta.label}">×</button>
+        <button type="button" aria-label="הסר ${meta.label}">
+          <span class="x-mark-icon"
+              ><svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="569.551"
+                height="569.55"
+                viewBox="0 0 569.551 569.55"
+              >
+                <path
+                  d="M474.637,0,284.8,189.9,94.914,0,0,94.914,189.888,284.809,0,474.636,94.914,569.55,284.8,379.722,474.637,569.55l94.914-94.914L379.723,284.809,569.551,94.914Z"
+                />
+              </svg>
+            </span>
+          </button>
       `;
 
       frag.appendChild(li);

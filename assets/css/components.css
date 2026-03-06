@@ -30,14 +30,13 @@
   color: var(--color-error-1);
   border-color: var(--color-error-1);
 
-  padding: 0.1rem 0.5rem;
+  padding: 0.25rem 0.5rem;
   border-radius: var(--border-radius-s);
 }
 
-.btn-cancel #x-mark {
-  font-size: 1rem;
-  margin-left: 1px;
-  transform: translateY(-0.5px);
+.btn-cancel .x-mark-icon {
+  width: 0.65rem;
+  margin-left: 2.5px;
 }
 
 .btn:disabled {
@@ -382,4 +381,13 @@ fieldset .form-field:last-of-type:has(.form-input-select[aria-expanded='true']) 
 
 .form-input-select-chip-img {
   width: 1.5rem;
+}
+
+.form-input-select-chip button {
+  padding: 2px 0;
+}
+
+.form-input-select-chip .x-mark-icon svg {
+  width: 0.6rem;
+  color: var(--color-error-2);
 }
