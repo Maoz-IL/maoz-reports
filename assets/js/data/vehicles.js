@@ -27,6 +27,6 @@ export const vehicles = [
   {
     value: 'שברולט סילברדו',
     label: 'שברולט סילברדו',
-    type: "ג'יפ",
+    type: 'טנדר',
   },
 ];
