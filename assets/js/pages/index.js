@@ -1,5 +1,6 @@
 import { workers } from '../data/workers.js';
 import { vehicles } from '../data/vehicles.js';
+import { customers } from '../data/customers.js';
 
 const formSteps = [...document.querySelectorAll('form fieldset')];
 const titleStageIndicator = document.querySelector(
@@ -235,6 +236,21 @@ function initSingleSelect(root) {
       }
     }
 
+    const imgWrap = root.querySelector('[data-select-img-wrap]');
+    const imgEl = root.querySelector('[data-select-img]');
+
+    const src = opt.dataset.img;
+
+    if (src) {
+      imgEl.src = src;
+      imgEl.alt = ''; // דקורטיבי
+      imgEl.decoding = 'async';
+      imgWrap.hidden = false; // יש תמונה -> מוצגת
+    } else {
+      imgEl.removeAttribute('src');
+      imgWrap.hidden = true; // אין תמונה -> אין מקום לתמונה
+    }
+
     base.close(); // נסגר בבחירה
     base.combobox.focus();
   };
@@ -443,6 +459,7 @@ const teamMembersSelectMenu = document.querySelector(
   '.form-input-select-menu-teamMembers',
 );
 const vehiclesSelectMenu = document.querySelector('.form-input-select-menu-vehicles');
+const customerSelectMenu = document.querySelector('.form-input-select-menu-customer');
 
 const teamLeadRoles = new Set(['מנהל פרויקט', 'ראש צוות', 'קבלן']);
 const teamMemberRoles = new Set(['עובד']);
@@ -460,6 +477,7 @@ renderSelectOptions(teamMembersSelectMenu, teamMembersFilter, {
 });
 
 renderSelectOptions(vehiclesSelectMenu, vehicles, { metaKey: 'type', showImage: false });
+renderSelectOptions(customerSelectMenu, customers, { metaKey: '', showImage: false });
 
 // הפעלה לכל select כזה בדף:
 document.querySelectorAll('.form-field').forEach((field) => {

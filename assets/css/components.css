@@ -191,7 +191,8 @@ form .steps fieldset {
   transition: opacity 300ms ease;
 }
 
-form .steps fieldset:not(:first-of-type) {
+form .steps fieldset:nth-of-type(3),
+form .steps fieldset:nth-of-type(4) {
   font-size: 20rem;
   opacity: var(--opacity);
 }
@@ -304,9 +305,19 @@ fieldset .form-field:last-of-type:has(.form-input-select[aria-expanded='true']) 
   gap: 0.5rem;
 }
 
-.form-input-select-img,
+.form-input-select-img-wrap,
 .option-image {
   width: 2rem;
+}
+
+.form-input-select-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.form-input-select-img,
+.option-image {
   border-radius: var(--border-radius-s);
 }
 
