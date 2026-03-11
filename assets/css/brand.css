@@ -14,6 +14,10 @@
   --color-error-1: #e27e6a;
   --color-error-2: #b96e5f;
 
+  --color-status-success: #43a047;
+  --color-status-warning: #fb8c00;
+  --color-status-error: #d4514f;
+
   --color-shadow-1: rgba(0, 0, 0, 0.12);
 
   /* ===============

@@ -402,3 +402,24 @@ fieldset .form-field:last-of-type:has(.form-input-select[aria-expanded='true']) 
   width: 0.6rem;
   color: var(--color-error-2);
 }
+
+.form-input-select-menu-taskStatus .form-input-select-menu-option {
+  justify-content: start;
+  gap: 0.5rem;
+}
+
+.option-swatch {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50rem;
+}
+
+.swatch--red {
+  background: var(--color-status-error);
+}
+.swatch--orange {
+  background: var(--color-status-warning);
+}
+.swatch--green {
+  background: var(--color-status-success);
+}

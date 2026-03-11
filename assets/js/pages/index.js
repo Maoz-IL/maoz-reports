@@ -222,46 +222,54 @@ function initSingleSelect(root) {
     base.valueEl.textContent = value;
     base.hiddenInput.value = value;
 
-    if (base.imgEl) {
-      const src = opt.dataset.img;
-      if (src) {
-        base.imgEl.src = src;
-        base.imgEl.alt = '';
-        base.imgEl.decoding = 'async';
-        base.imgEl.removeAttribute('hidden');
-      } else {
-        base.imgEl.removeAttribute('src');
-        base.imgEl.alt = '';
-        base.imgEl.setAttribute('hidden', '');
+    const swatchTarget = root.querySelector('[data-select-swatch]');
+
+    if (swatchTarget) {
+      // מחפש את העיגול בתוך האופציה שנבחרה
+      const swatchSource = opt.querySelector('.option-swatch');
+
+      // מוחק צבע קודם (כל class שמתחיל ב- swatch--)
+      swatchTarget.classList.forEach((cls) => {
+        if (cls.startsWith('swatch--')) swatchTarget.classList.remove(cls);
+      });
+
+      // מוסיף את צבע האופציה שנבחרה
+      if (swatchSource) {
+        const colorClass = [...swatchSource.classList].find((cls) =>
+          cls.startsWith('swatch--'),
+        );
+        if (colorClass) swatchTarget.classList.add(colorClass);
       }
     }
 
     const imgWrap = root.querySelector('[data-select-img-wrap]');
     const imgEl = root.querySelector('[data-select-img]');
 
-    const src = opt.dataset.img;
+    if (imgWrap && imgEl) {
+      const src = opt.dataset.img;
 
-    if (src) {
-      imgEl.src = src;
-      imgEl.alt = ''; // דקורטיבי
-      imgEl.decoding = 'async';
-      imgWrap.hidden = false; // יש תמונה -> מוצגת
-    } else {
-      imgEl.removeAttribute('src');
-      imgWrap.hidden = true; // אין תמונה -> אין מקום לתמונה
+      if (src) {
+        imgEl.src = src;
+        imgEl.alt = ''; // דקורטיבי
+        imgEl.decoding = 'async';
+        imgWrap.hidden = false; // יש תמונה -> מוצגת
+      } else {
+        imgEl.removeAttribute('src');
+        imgWrap.hidden = true; // אין תמונה -> אין מקום לתמונה
+      }
     }
 
     base.close(); // נסגר בבחירה
     base.combobox.focus();
   };
 
-  // קליקים על אופציות
+  // קליק על אופציות
   base.listbox.addEventListener('click', (e) => {
     const opt = e.target.closest('[role="option"]');
     if (opt) setSelected(opt);
   });
 
-  // Enter/Space לבחור אופציה פעילה
+  // Enter/Space בוחר אופציה פעילה
   base.combobox.addEventListener('keydown', (e) => {
     if ((e.key === 'Enter' || e.key === ' ') && base.isOpen()) {
       e.preventDefault();
