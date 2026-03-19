@@ -221,6 +221,7 @@ function initSingleSelect(root) {
 
     base.valueEl.textContent = value;
     base.hiddenInput.value = value;
+    base.hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
 
     const swatchTarget = root.querySelector('[data-select-swatch]');
 
@@ -286,6 +287,9 @@ function initMultiSelect(root) {
   const singular = root.dataset.multiSingular || 'פריט';
   const plural = root.dataset.multiPlural || `${singular}ים`;
 
+  const oneWord = root.dataset.multiOneWord || 'אחד'; // אחד / אחת
+  const oneVerb = root.dataset.multiOneVerb || 'נבחר'; // נבחר / נבחרה
+
   // value -> { label, img, alt }
   const selected = new Map();
 
@@ -294,7 +298,7 @@ function initMultiSelect(root) {
     const placeholder = base.combobox.dataset.placeholder || '‎';
 
     if (n === 0) base.valueEl.textContent = placeholder;
-    else if (n === 1) base.valueEl.textContent = `${singular} אחד נבחר`;
+    else if (n === 1) base.valueEl.textContent = `${singular} ${oneWord} ${oneVerb}`;
     else base.valueEl.textContent = `${n} ${plural} נבחרו`;
   };
 
@@ -409,6 +413,24 @@ function initMultiSelect(root) {
   updateButtonText();
   syncHiddenInput();
   renderChips();
+
+  const reset = () => {
+    selected.clear(); // ✅ זה מה שהיה חסר
+
+    // אפס aria-selected ברשימה
+    base.listbox.querySelectorAll('[role="option"]').forEach((opt) => {
+      opt.setAttribute('aria-selected', 'false');
+    });
+
+    updateButtonText();
+    syncHiddenInput();
+    renderChips();
+
+    // (רשות) סגור את התפריט אם פתוח
+    if (base.isOpen()) base.close();
+  };
+
+  root._resetMultiSelect = reset; // מאפשר לקרוא מבחוץ
 }
 
 // ===================
@@ -495,3 +517,66 @@ document.querySelectorAll('.form-field').forEach((field) => {
     initMultiSelect(field);
   }
 });
+
+// ===================
+// שדות המשך
+
+const splitWhen = (str) =>
+  (str || '')
+    .split('|')
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+function resetFollowupsArea(area) {
+  if (!area) return;
+
+  // 1) אפס multi-selectים שלך (מנקה גם state פנימי)
+  area.querySelectorAll('.form-field').forEach((field) => {
+    field?._resetMultiSelect?.();
+  });
+
+  // 2) נקה ערכים של inputs/textarea/select רגילים בתוך האזור
+  area.querySelectorAll('input, textarea, select').forEach((el) => {
+    if (el.matches('input[type="hidden"], input[type="text"], textarea')) el.value = '';
+    if (el.matches('input[type="checkbox"], input[type="radio"]')) el.checked = false;
+    if (el.tagName === 'SELECT') el.selectedIndex = 0;
+  });
+}
+
+function setRequiredInArea(area, isRequired) {
+  if (!area) return;
+  area.querySelectorAll('[data-required-when-visible]').forEach((el) => {
+    el.required = isRequired;
+  });
+}
+
+function initConditionalFollowups() {
+  const triggers = document.querySelectorAll(
+    '[data-followups-target][data-followups-show-when]',
+  );
+
+  triggers.forEach((triggerField) => {
+    const targetSelector = triggerField.dataset.followupsTarget;
+    const target = document.querySelector(targetSelector);
+    const showWhen = new Set(splitWhen(triggerField.dataset.followupsShowWhen));
+
+    // מקור האמת אצלך הוא hidden input בתוך אותו form-field
+    const hidden = triggerField.querySelector('input[type="hidden"]');
+    if (!hidden || !target) return;
+
+    const apply = () => {
+      const shouldShow = showWhen.has(hidden.value);
+
+      target.hidden = !shouldShow;
+      setRequiredInArea(target, shouldShow);
+
+      if (!shouldShow) resetFollowupsArea(target);
+    };
+
+    hidden.addEventListener('change', apply);
+    apply(); // הרצה ראשונית
+  });
+}
+
+// להפעיל אחרי שכל ה-selects אותחלו:
+initConditionalFollowups();

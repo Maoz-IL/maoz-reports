@@ -80,3 +80,7 @@ svg line {
   fill: currentColor;
   stroke: currentColor;
 }
+
+[hidden] {
+  display: none !important;
+}

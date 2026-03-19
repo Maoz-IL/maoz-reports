@@ -181,14 +181,17 @@ form .steps fieldset {
 
   grid-area: 1 / 1;
 
-  display: flex;
-  flex-direction: column;
-  row-gap: 2rem;
-
   font-weight: 800;
   text-align: center;
 
   transition: opacity 300ms ease;
+}
+
+form .steps fieldset,
+.form-followup-group {
+  display: flex;
+  flex-direction: column;
+  row-gap: 2rem;
 }
 
 form .steps fieldset:nth-of-type(3),
@@ -245,6 +248,12 @@ form .steps fieldset:not(.current-step) {
   border-bottom: 2.5px solid var(--color-nutral-1);
   border-top-right-radius: var(--border-radius-m);
   border-top-left-radius: var(--border-radius-m);
+}
+
+textarea.form-input {
+  line-height: 1.5rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 .form-input-icon {

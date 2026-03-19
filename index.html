@@ -366,7 +366,12 @@
                 </div>
               </div>
               <!-- סטטוס המשימה באתר -->
-              <div class="form-field" data-field="select">
+              <div
+                class="form-field"
+                data-field="select"
+                data-followups-target="#taskStatusFollowups"
+                data-followups-show-when="טופלה חלקית|לא טופלה"
+              >
                 <label class="form-label form-label-required" for="taskStatus">
                   סטטוס המשימה באתר
                   <span class="form-label-asterisk">*</span>
@@ -442,6 +447,126 @@
                       <span class="option-text">לא טופלה</span>
                     </li>
                   </ul>
+                </div>
+              </div>
+              <!-- שדות המשך לסטטוס המשימה באתר (מוסתר כברירת מחדל) -->
+              <div
+                class="form-followup-group task-status-followups"
+                id="taskStatusFollowups"
+                hidden
+              >
+                <!-- סיבה (בחירה מרובה) -->
+                <div
+                  class="form-field"
+                  data-field="multi-select"
+                  data-multi-singular="סיבה"
+                  data-multi-plural="סיבות"
+                  data-multi-one-word="אחת"
+                  data-multi-one-verb="נבחרה"
+                >
+                  <label class="form-label form-label-required" for="">
+                    סיבה
+                    <span class="form-label-asterisk">*</span>
+                  </label>
+
+                  <div class="form-control">
+                    <input
+                      type="hidden"
+                      name="taskStatusReasons"
+                      id="taskStatusReasons"
+                      data-required-when-visible
+                    />
+
+                    <button
+                      type="button"
+                      class="form-input form-input-select form-input-select-multi"
+                      id="taskStatusReasonsBtn"
+                      role="combobox"
+                      aria-haspopup="listbox"
+                      aria-expanded="false"
+                      aria-controls="taskStatusReasons-listbox"
+                    >
+                      <span class="form-input-select-value" data-select-value></span>
+                      <span class="form-input-icon" aria-hidden="true">▾</span>
+                    </button>
+
+                    <ul
+                      class="form-input-select-menu form-input-select-multi-menu"
+                      id="taskStatusReasons-listbox"
+                      role="listbox"
+                      tabindex="-1"
+                      hidden
+                    >
+                      <!-- דוגמה לאפשרויות (תערוך לפי הצורך) -->
+                      <li
+                        class="form-input-select-menu-option"
+                        role="option"
+                        tabindex="-1"
+                        data-value="מזג אוויר"
+                      >
+                        מזג אוויר
+                      </li>
+                      <li
+                        class="form-input-select-menu-option"
+                        role="option"
+                        tabindex="-1"
+                        data-value="חסר ציוד/כלי"
+                      >
+                        חסר ציוד/כלי
+                      </li>
+                      <li
+                        class="form-input-select-menu-option"
+                        role="option"
+                        tabindex="-1"
+                        data-value="אין גישה לעץ/ים"
+                      >
+                        אין גישה לעץ/ים
+                      </li>
+                      <li
+                        class="form-input-select-menu-option"
+                        role="option"
+                        tabindex="-1"
+                        data-value="נדרש אישור לקוח"
+                      >
+                        נדרש אישור לקוח
+                      </li>
+                      <li
+                        class="form-input-select-menu-option"
+                        role="option"
+                        tabindex="-1"
+                        data-value="אין הצדקה לביצוע המשימה"
+                      >
+                        אין הצדקה לביצוע המשימה
+                      </li>
+                      <li
+                        class="form-input-select-menu-option"
+                        role="option"
+                        tabindex="-1"
+                        data-value="אחר"
+                      >
+                        אחר
+                      </li>
+                    </ul>
+
+                    <ul class="form-input-select-multi-chosen"></ul>
+                  </div>
+                </div>
+
+                <!-- פירוט -->
+                <div class="form-field" data-field="textarea">
+                  <label class="form-label form-label-required" for="taskStatusDetails">
+                    פירוט
+                    <span class="form-label-asterisk">*</span>
+                  </label>
+                  <div class="form-control">
+                    <textarea
+                      class="form-input"
+                      id="taskStatusDetails"
+                      name="taskStatusDetails"
+                      rows="6"
+                      data-required-when-visible
+                    ></textarea>
+                  </div>
                 </div>
               </div>
             </fieldset>
