@@ -194,7 +194,6 @@ form .steps fieldset,
   row-gap: 2rem;
 }
 
-form .steps fieldset:nth-of-type(3),
 form .steps fieldset:nth-of-type(4) {
   font-size: 20rem;
   opacity: var(--opacity);

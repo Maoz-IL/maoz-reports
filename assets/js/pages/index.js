@@ -1,6 +1,7 @@
 import { workers } from '../data/workers.js';
 import { vehicles } from '../data/vehicles.js';
 import { customers } from '../data/customers.js';
+import { worktypes } from '../data/worktypes.js';
 
 const formSteps = [...document.querySelectorAll('form fieldset')];
 const titleStageIndicator = document.querySelector(
@@ -490,6 +491,7 @@ const teamMembersSelectMenu = document.querySelector(
 );
 const vehiclesSelectMenu = document.querySelector('.form-input-select-menu-vehicles');
 const customerSelectMenu = document.querySelector('.form-input-select-menu-customer');
+const worktypeSelectMenus = document.querySelectorAll('.form-input-select-menu-worktype');
 
 const teamLeadRoles = new Set(['מנהל פרויקט', 'ראש צוות', 'קבלן']);
 const teamMemberRoles = new Set(['עובד']);
@@ -508,6 +510,9 @@ renderSelectOptions(teamMembersSelectMenu, teamMembersFilter, {
 
 renderSelectOptions(vehiclesSelectMenu, vehicles, { metaKey: 'type', showImage: false });
 renderSelectOptions(customerSelectMenu, customers, { metaKey: '', showImage: false });
+worktypeSelectMenus.forEach((menu) => {
+  renderSelectOptions(menu, worktypes, { metaKey: '', showImage: false });
+});
 
 // הפעלה לכל select כזה בדף:
 document.querySelectorAll('.form-field').forEach((field) => {
