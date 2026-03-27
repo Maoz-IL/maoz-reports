@@ -4,6 +4,7 @@ import { customers } from '../data/customers.js';
 import { workTypes } from '../data/workTypes.js';
 import { workHourTypes } from '../data/workHourTypes.js';
 import { treeTypes } from '../data/treeTypes.js';
+import { treeBindTypes } from '../data/treeBindTypes.js';
 
 const formSteps = [...document.querySelectorAll('form fieldset')];
 const titleStageIndicator = document.querySelector(
@@ -502,6 +503,9 @@ const workHourDescriptionSelectMenus = document.querySelectorAll(
 const treeTypeSelectMenus = document.querySelectorAll(
   '.form-input-select-menu-tree-type',
 );
+const treeBindTypeSelectMenus = document.querySelectorAll(
+  '.form-input-select-menu-tree-bind-type',
+);
 
 const teamLeadRoles = new Set(['מנהל פרויקט', 'ראש צוות', 'קבלן']);
 const teamMemberRoles = new Set(['עובד']);
@@ -532,6 +536,10 @@ workHourDescriptionSelectMenus.forEach((menu) => {
 
 treeTypeSelectMenus.forEach((menu) => {
   renderSelectOptions(menu, treeTypes, { metaKey: '', showImage: false });
+});
+
+treeBindTypeSelectMenus.forEach((menu) => {
+  renderSelectOptions(menu, treeBindTypes, { metaKey: '', showImage: false });
 });
 
 // הפעלה לכל select כזה בדף:
