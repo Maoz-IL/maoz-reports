@@ -194,7 +194,7 @@ form .steps fieldset,
   row-gap: 2rem;
 }
 
-.worktype-followups {
+.work-type-followups {
   padding-right: 7.5%;
   border-right: 3px solid var(--color-primary-1);
   margin-right: 1rem;

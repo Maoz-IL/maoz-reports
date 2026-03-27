@@ -1,8 +1,9 @@
 import { workers } from '../data/workers.js';
 import { vehicles } from '../data/vehicles.js';
 import { customers } from '../data/customers.js';
-import { worktypes } from '../data/worktypes.js';
+import { workTypes } from '../data/workTypes.js';
 import { workHourTypes } from '../data/workHourTypes.js';
+import { treeTypes } from '../data/treeTypes.js';
 
 const formSteps = [...document.querySelectorAll('form fieldset')];
 const titleStageIndicator = document.querySelector(
@@ -417,7 +418,7 @@ function initMultiSelect(root) {
   renderChips();
 
   const reset = () => {
-    selected.clear(); // ✅ זה מה שהיה חסר
+    selected.clear();
 
     // אפס aria-selected ברשימה
     base.listbox.querySelectorAll('[role="option"]').forEach((opt) => {
@@ -492,9 +493,14 @@ const teamMembersSelectMenu = document.querySelector(
 );
 const vehiclesSelectMenu = document.querySelector('.form-input-select-menu-vehicles');
 const customerSelectMenu = document.querySelector('.form-input-select-menu-customer');
-const worktypeSelectMenus = document.querySelectorAll('.form-input-select-menu-worktype');
+const workTypeselectMenus = document.querySelectorAll(
+  '.form-input-select-menu-work-type',
+);
 const workHourDescriptionSelectMenus = document.querySelectorAll(
   '.form-input-select-menu-work-hour-description',
+);
+const treeTypeSelectMenus = document.querySelectorAll(
+  '.form-input-select-menu-tree-type',
 );
 
 const teamLeadRoles = new Set(['מנהל פרויקט', 'ראש צוות', 'קבלן']);
@@ -516,12 +522,16 @@ renderSelectOptions(teamMembersSelectMenu, teamMembersFilter, {
 renderSelectOptions(vehiclesSelectMenu, vehicles, { metaKey: 'type', showImage: false });
 renderSelectOptions(customerSelectMenu, customers, { metaKey: '', showImage: false });
 
-worktypeSelectMenus.forEach((menu) => {
-  renderSelectOptions(menu, worktypes, { metaKey: '', showImage: false });
+workTypeselectMenus.forEach((menu) => {
+  renderSelectOptions(menu, workTypes, { metaKey: '', showImage: false });
 });
 
 workHourDescriptionSelectMenus.forEach((menu) => {
   renderSelectOptions(menu, workHourTypes, { metaKey: '', showImage: false });
+});
+
+treeTypeSelectMenus.forEach((menu) => {
+  renderSelectOptions(menu, treeTypes, { metaKey: '', showImage: false });
 });
 
 // הפעלה לכל select כזה בדף:

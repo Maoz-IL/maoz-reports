@@ -574,23 +574,23 @@
               <legend>שלב שלוש</legend>
               <!-- סוג עבודה -->
               <div class="form-field" data-field="select">
-                <label class="form-label form-label-required" for="worktype">
+                <label class="form-label form-label-required" for="work-type">
                   סוג עבודה
                   <span class="form-label-asterisk">*</span>
                 </label>
                 <div class="form-control">
                   <!-- האינפוט המוסתר שנשלח בפועל בטופס -->
-                  <input type="hidden" name="worktype" id="worktype" required />
+                  <input type="hidden" name="work-type" id="work-type" required />
                   <!-- ה"משטח" שנלחץ כדי לפתוח -->
                   <button
                     type="button"
                     class="form-input form-input-select form-input-select-single"
-                    id="worktype"
+                    id="work-type"
                     role="combobox"
                     aria-haspopup="listbox"
                     aria-expanded="false"
-                    aria-controls="worktype-listbox"
-                    aria-labelledby="worktype-combobox"
+                    aria-controls="work-type-listbox"
+                    aria-labelledby="work-type-combobox"
                   >
                     <span class="form-input-select-value-group">
                       <span class="form-input-select-img-wrap" data-select-img-wrap>
@@ -608,8 +608,8 @@
                   </button>
                   <!-- תפריט בחירה -->
                   <ul
-                    class="form-input-select-menu form-input-select-single-menu form-input-select-menu-worktype"
-                    id="worktype-listbox"
+                    class="form-input-select-menu form-input-select-single-menu form-input-select-menu-work-type"
+                    id="work-type-listbox"
                     role="listbox"
                     tabindex="-1"
                     hidden
@@ -617,7 +617,7 @@
                 </div>
               </div>
               <!-- קבוצת שדות המשך לסוג עבודה -->
-              <div class="form-followup-group worktype-followups">
+              <div class="form-followup-group work-type-followups">
                 <!-- פירוט שעת עבודה -->
                 <div class="form-field" data-field="select">
                   <label
@@ -664,6 +664,50 @@
                     <ul
                       class="form-input-select-menu form-input-select-single-menu form-input-select-menu-work-hour-description"
                       id="work-hour-description-listbox"
+                      role="listbox"
+                      tabindex="-1"
+                      hidden
+                    ></ul>
+                  </div>
+                </div>
+                <!-- סוג העץ/ים -->
+                <div class="form-field" data-field="select">
+                  <label class="form-label form-label-required" for="tree-type">
+                    סוג העץ/ים
+                    <span class="form-label-asterisk">*</span>
+                  </label>
+                  <div class="form-control">
+                    <!-- האינפוט המוסתר שנשלח בפועל בטופס -->
+                    <input type="hidden" name="tree-type" id="tree-type" required />
+                    <!-- ה"משטח" שנלחץ כדי לפתוח -->
+                    <button
+                      type="button"
+                      class="form-input form-input-select form-input-select-single"
+                      id="tree-type"
+                      role="combobox"
+                      aria-haspopup="listbox"
+                      aria-expanded="false"
+                      aria-controls="tree-type-listbox"
+                      aria-labelledby="tree-type-combobox"
+                    >
+                      <span class="form-input-select-value-group">
+                        <span class="form-input-select-img-wrap" data-select-img-wrap>
+                          <img class="form-input-select-img" data-select-img />
+                        </span>
+                        <span class="form-input-select-value" data-select-value></span>
+                      </span>
+                      <span class="form-input-icon" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                          <path
+                            d="M240 192C240 147.8 275.8 112 320 112C364.2 112 400 147.8 400 192C400 236.2 364.2 272 320 272C275.8 272 240 236.2 240 192zM448 192C448 121.3 390.7 64 320 64C249.3 64 192 121.3 192 192C192 262.7 249.3 320 320 320C390.7 320 448 262.7 448 192zM144 544C144 473.3 201.3 416 272 416L368 416C438.7 416 496 473.3 496 544L496 552C496 565.3 506.7 576 520 576C533.3 576 544 565.3 544 552L544 544C544 446.8 465.2 368 368 368L272 368C174.8 368 96 446.8 96 544L96 552C96 565.3 106.7 576 120 576C133.3 576 144 565.3 144 552L144 544z"
+                          />
+                        </svg>
+                      </span>
+                    </button>
+                    <!-- תפריט בחירה -->
+                    <ul
+                      class="form-input-select-menu form-input-select-single-menu form-input-select-menu-tree-type"
+                      id="tree-type-listbox"
                       role="listbox"
                       tabindex="-1"
                       hidden

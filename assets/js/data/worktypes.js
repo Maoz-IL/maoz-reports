@@ -1,4 +1,4 @@
-export const worktypes = [
+export const workTypes = [
   {
     value: 'שעת עבודה',
     label: 'שעת עבודה',
