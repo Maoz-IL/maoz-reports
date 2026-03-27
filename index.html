@@ -130,6 +130,7 @@
         </div>
         <form action="">
           <div class="steps" data-step="1">
+            <!-- שלב 1 -->
             <fieldset class="current-step">
               <legend>שלב אחד</legend>
               <!-- תאריך -->
@@ -295,6 +296,7 @@
                 </div>
               </div>
             </fieldset>
+            <!-- שלב 2 -->
             <fieldset>
               <legend>שלב שתיים</legend>
               <!-- לקוח -->
@@ -570,6 +572,7 @@
                 </div>
               </div>
             </fieldset>
+            <!-- שלב 3 -->
             <fieldset>
               <legend>שלב שלוש</legend>
               <!-- סוג עבודה -->
@@ -714,8 +717,31 @@
                     ></ul>
                   </div>
                 </div>
+                <!-- כמות העצים -->
+                <div class="form-field" data-field="tree-count">
+                  <label class="form-label form-label-required" for="tree-count">
+                    כמות העצים
+                    <span class="form-label-asterisk">*</span>
+                  </label>
+
+                  <div class="form-control">
+                    <input
+                      class="form-input"
+                      type="number"
+                      id="tree-count"
+                      name="tree-count"
+                      inputmode="numeric"
+                      min="0"
+                      step="1"
+                      required
+                      aria-describedby="tree-count-help tree-count-error"
+                      aria-invalid="false"
+                    />
+                  </div>
+                </div>
               </div>
             </fieldset>
+            <!-- 4 -->
             <fieldset>
               <legend>שלב ארבע</legend>
               4
