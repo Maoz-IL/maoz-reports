@@ -718,8 +718,8 @@
                   </div>
                 </div>
                 <!-- כמות העצים -->
-                <div class="form-field" data-field="tree-count">
-                  <label class="form-label form-label-required" for="tree-count">
+                <div class="form-field" data-field="number">
+                  <label class="form-label form-label-required" for="trees-count">
                     כמות העצים
                     <span class="form-label-asterisk">*</span>
                   </label>
@@ -728,8 +728,8 @@
                     <input
                       class="form-input"
                       type="number"
-                      id="tree-count"
-                      name="tree-count"
+                      id="trees-count"
+                      name="trees-count"
                       inputmode="numeric"
                       min="0"
                       step="1"
@@ -738,7 +738,7 @@
                   </div>
                 </div>
                 <!-- גובה העצים -->
-                <div class="form-field" data-field="tree-height">
+                <div class="form-field" data-field="number">
                   <label class="form-label form-label-required" for="tree-height">
                     גובה העצים (מטרים)
                     <span class="form-label-asterisk">*</span>
@@ -750,6 +750,26 @@
                       type="number"
                       id="tree-height"
                       name="tree-height"
+                      inputmode="numeric"
+                      min="0"
+                      step="1"
+                      required
+                    />
+                  </div>
+                </div>
+                <!-- מספר ההובלות -->
+                <div class="form-field" data-field="number">
+                  <label class="form-label form-label-required" for="transports-count">
+                    מספר ההובלות
+                    <span class="form-label-asterisk">*</span>
+                  </label>
+
+                  <div class="form-control">
+                    <input
+                      class="form-input"
+                      type="number"
+                      id="transports-count"
+                      name="transports-count"
                       inputmode="numeric"
                       min="0"
                       step="1"
