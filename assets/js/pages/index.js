@@ -613,3 +613,75 @@ function initConditionalFollowups() {
 
 // להפעיל אחרי שכל ה-selects אותחלו:
 initConditionalFollowups();
+
+// ==========================================================================
+
+function initConditionalFieldsBySelect({
+  triggerHiddenSelector,
+  followupsContainerSelector,
+  fieldSelector = '.form-field[data-show-when]',
+}) {
+  const triggerHidden = document.querySelector(triggerHiddenSelector);
+  const container = document.querySelector(followupsContainerSelector);
+  if (!triggerHidden || !container) return;
+
+  const split = (s) =>
+    (s || '')
+      .split('|')
+      .map((x) => x.trim())
+      .filter(Boolean);
+
+  const resetField = (field) => {
+    // reset ל-multi select שלך אם קיים
+    field?._resetMultiSelect?.();
+
+    // reset לערכים רגילים
+    field.querySelectorAll('input, textarea, select').forEach((el) => {
+      if (
+        el.matches(
+          'input[type="hidden"], input[type="text"], input[type="number"], textarea',
+        )
+      )
+        el.value = '';
+      if (el.matches('input[type="checkbox"], input[type="radio"]')) el.checked = false;
+      if (el.tagName === 'SELECT') el.selectedIndex = 0;
+
+      // אם אתה משתמש ב-required דינמי דרך data-required-when-visible
+      if (el.hasAttribute('data-required-when-visible')) el.required = false;
+    });
+
+    // ניקוי errors/help אם יש לך (לא חובה)
+  };
+
+  const apply = () => {
+    const value = triggerHidden.value;
+
+    let anyVisible = false;
+
+    container.querySelectorAll(fieldSelector).forEach((field) => {
+      const allowed = new Set(split(field.dataset.showWhen));
+      const shouldShow = allowed.has(value);
+
+      field.hidden = !shouldShow;
+
+      // required דינמי רק כשהשדה מוצג
+      field.querySelectorAll('[data-required-when-visible]').forEach((el) => {
+        el.required = shouldShow;
+      });
+
+      if (!shouldShow) resetField(field);
+      else anyVisible = true;
+    });
+
+    // אם תרצה: להסתיר את כל קבוצת ההמשך כשאין אף שדה רלוונטי
+    container.hidden = !anyVisible;
+  };
+
+  triggerHidden.addEventListener('change', apply);
+  apply();
+}
+
+initConditionalFieldsBySelect({
+  triggerHiddenSelector: '#work-type',
+  followupsContainerSelector: '.work-type-followups',
+});
