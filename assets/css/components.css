@@ -417,7 +417,8 @@ fieldset .form-field:last-of-type:has(.form-input-select[aria-expanded='true']) 
   color: var(--color-error-2);
 }
 
-.form-input-select-menu-taskStatus .form-input-select-menu-option {
+.form-input-select-menu-taskStatus .form-input-select-menu-option,
+.form-input-select-menu-tree-stump-for-charge .form-input-select-menu-option {
   justify-content: start;
   gap: 0.5rem;
 }
