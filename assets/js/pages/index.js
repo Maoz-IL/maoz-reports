@@ -856,3 +856,13 @@ if (btnAdd && container && tpl) {
 } else {
   console.warn('Missing btnAdd/container/template:', { btnAdd, container, tpl });
 }
+
+container.addEventListener('click', (e) => {
+  const btn = e.target.closest('.btn-remove-work-type');
+  if (!btn) return;
+
+  const group = btn.closest('.form-fields-group-work-type');
+  if (!group) return;
+
+  group.remove();
+});
