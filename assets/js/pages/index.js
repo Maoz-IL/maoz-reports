@@ -614,7 +614,9 @@ function initConditionalFollowups() {
 // להפעיל אחרי שכל ה-selects אותחלו:
 initConditionalFollowups();
 
-// ==========================================================================
+// ===========================================================
+// הצגת/הסתרת שדות המשך רלוונטיים בסוג עבודה
+// ===========================================================
 
 function initConditionalFieldsBySelect({
   triggerHiddenSelector,
@@ -685,3 +687,172 @@ initConditionalFieldsBySelect({
   triggerHiddenSelector: '#work-type',
   followupsContainerSelector: '.work-type-followups',
 });
+
+// ===========================================================
+// ניהול יצירת בלוקים של סוג עבודה
+// ===========================================================
+
+function suffixIdsByName(groupEl, index) {
+  const suffix = `-${index}`;
+
+  groupEl.querySelectorAll('.form-field').forEach((field) => {
+    const hidden = field.querySelector('input[type="hidden"][name]');
+    const normal = field.querySelector(
+      'input:not([type="hidden"])[name], textarea[name], select[name]',
+    );
+    const baseEl = hidden || normal;
+    if (!baseEl) return;
+
+    const base = baseEl.name;
+    if (!base) return;
+
+    const label = field.querySelector('label');
+    const combobox = field.querySelector('[role="combobox"]');
+    const listbox = field.querySelector('[role="listbox"]');
+
+    // Custom select
+    if (hidden && combobox && listbox) {
+      const labelId = `${base}__label${suffix}`;
+      const hiddenId = `${base}${suffix}`;
+      const comboId = `${base}__combobox${suffix}`;
+      const listId = `${base}__listbox${suffix}`;
+
+      if (label) {
+        label.id = labelId;
+        label.htmlFor = comboId;
+      }
+
+      hidden.id = hiddenId;
+
+      combobox.id = comboId;
+      combobox.setAttribute('aria-controls', listId);
+      combobox.setAttribute('aria-labelledby', labelId);
+
+      listbox.id = listId;
+      return;
+    }
+
+    // Normal field
+    const newId = `${base}${suffix}`;
+    if (label) label.htmlFor = newId;
+    baseEl.id = newId;
+  });
+}
+
+function resetNewGroup(groupEl) {
+  groupEl.querySelectorAll('input, textarea').forEach((el) => {
+    if (el.type === 'checkbox' || el.type === 'radio') el.checked = false;
+    else el.value = '';
+  });
+
+  groupEl.querySelectorAll('[role="option"]').forEach((opt) => {
+    opt.setAttribute('aria-selected', 'false');
+    opt.classList.remove('is-active');
+  });
+
+  groupEl.querySelectorAll('.form-input-select-multi-chosen').forEach((ul) => {
+    ul.textContent = '';
+  });
+}
+
+function initWorkTypeGroup(groupEl) {
+  // 1) Render menus בתוך הבלוק בלבד
+  groupEl.querySelectorAll('.form-input-select-menu-work-type').forEach((menu) => {
+    renderSelectOptions(menu, workTypes, { showImage: false });
+  });
+
+  groupEl
+    .querySelectorAll('.form-input-select-menu-work-hour-description')
+    .forEach((menu) => {
+      renderSelectOptions(menu, workHourTypes, { showImage: false });
+    });
+
+  groupEl.querySelectorAll('.form-input-select-menu-tree-type').forEach((menu) => {
+    renderSelectOptions(menu, treeTypes, { showImage: false });
+  });
+
+  groupEl.querySelectorAll('.form-input-select-menu-tree-bind-type').forEach((menu) => {
+    renderSelectOptions(menu, treeBindTypes, { showImage: false });
+  });
+
+  // 2) Init selects בתוך הבלוק בלבד
+  groupEl.querySelectorAll('.form-field').forEach((field) => {
+    if (field.dataset.inited === '1') return;
+
+    if (field.querySelector('.form-input-select-single-menu')) {
+      initSingleSelect(field);
+      field.dataset.inited = '1';
+    } else if (field.querySelector('.form-input-select-multi-menu')) {
+      initMultiSelect(field);
+      field.dataset.inited = '1';
+    }
+  });
+
+  // 3) Conditional followups בתוך הבלוק (scoped!)
+  const followups = groupEl.querySelector('.work-type-followups');
+  const workTypeHidden = groupEl.querySelector('input[type="hidden"][name="work-type"]');
+
+  if (!followups || !workTypeHidden) return;
+
+  const split = (s) =>
+    (s || '')
+      .split('|')
+      .map((x) => x.trim())
+      .filter(Boolean);
+
+  const resetField = (field) => {
+    field?._resetMultiSelect?.();
+    field.querySelectorAll('input, textarea').forEach((el) => {
+      if (el.type === 'checkbox' || el.type === 'radio') el.checked = false;
+      else el.value = '';
+      if (el.hasAttribute('data-required-when-visible')) el.required = false;
+    });
+  };
+
+  const apply = () => {
+    const value = workTypeHidden.value;
+    let anyVisible = false;
+
+    followups.querySelectorAll('.form-field[data-show-when]').forEach((field) => {
+      const allowed = new Set(split(field.dataset.showWhen));
+      const shouldShow = allowed.has(value);
+
+      field.hidden = !shouldShow;
+
+      field.querySelectorAll('[data-required-when-visible]').forEach((el) => {
+        el.required = shouldShow;
+      });
+
+      if (!shouldShow) resetField(field);
+      else anyVisible = true;
+    });
+
+    followups.hidden = !anyVisible;
+  };
+
+  workTypeHidden.addEventListener('change', apply);
+  apply();
+}
+
+// ---------- Hook לכפתור הוספה ----------
+
+const btnAdd = document.querySelector('.btn-add-work-type-field');
+const container = document.querySelector('[data-work-type-container]');
+const tpl = document.querySelector('#template-work-type-group');
+
+if (btnAdd && container && tpl) {
+  btnAdd.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    const index = container.children.length + 1;
+    const group = tpl.content.firstElementChild.cloneNode(true);
+
+    suffixIdsByName(group, index);
+    resetNewGroup(group);
+
+    container.prepend(group);
+    initWorkTypeGroup(group);
+  });
+} else {
+  console.warn('Missing btnAdd/container/template:', { btnAdd, container, tpl });
+}

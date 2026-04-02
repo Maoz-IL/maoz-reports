@@ -198,12 +198,21 @@ form .steps fieldset {
 }
 
 form .steps fieldset,
+div[data-work-type-container],
 .form-fields-group,
 .form-followup-group {
   display: flex;
   flex-direction: column;
   row-gap: 2rem;
 }
+
+.form-fields-group-work-type {
+  padding-bottom: 0.5rem;
+}
+
+/* .form-fields-group-work-type:nth-of-type(even) {
+  background-color: #fff;
+} */
 
 .form-field-btns-group {
   display: flex;
@@ -355,6 +364,10 @@ fieldset .form-field:last-of-type:has(.form-input-select[aria-expanded='true']) 
 .form-input-select-img,
 .option-image {
   border-radius: var(--border-radius-s);
+}
+
+.form-input-select-img:where(:not([src]), [src='']) {
+  display: none;
 }
 
 .form-input-select-menu {
