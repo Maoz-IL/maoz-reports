@@ -27,12 +27,17 @@
 
 .btn-cancel {
   font-size: 0.85rem;
-
-  color: var(--color-error-1);
-  border-color: var(--color-error-1);
-
   padding: 0.25rem 0.5rem;
   border-radius: var(--border-radius-s);
+}
+
+.btn-primary-cancel {
+  background-color: var(--color-error-1);
+}
+
+.btn-secondary-cancel {
+  color: var(--color-error-1);
+  border-color: var(--color-error-1);
 }
 
 .btn-cancel .x-mark-icon {
@@ -553,7 +558,7 @@ fieldset .form-field:last-of-type:has(.form-input-select[aria-expanded='true']) 
   color: #fff;
   font-size: 1.5rem;
   font-weight: 500;
-  background: rgba(0, 0, 0, 0.55);
+  background-color: rgba(0, 0, 0, 0.55);
   border: 0;
   border-radius: 50rem;
 }
