@@ -206,6 +206,10 @@ div[data-work-type-container],
   row-gap: 2rem;
 }
 
+form .steps fieldset:nth-of-type(4) {
+  row-gap: 0.5rem;
+}
+
 .form-fields-group-work-type {
   padding-bottom: 0.5rem;
 }
@@ -228,11 +232,6 @@ div[data-work-type-container],
   padding-right: 7.5%;
   border-right: 3px solid var(--color-primary-1);
   margin-right: 1rem;
-}
-
-form .steps fieldset:nth-of-type(4) {
-  font-size: 20rem;
-  opacity: var(--opacity);
 }
 
 form .steps fieldset:not(.current-step) {
@@ -472,4 +471,94 @@ fieldset .form-field:last-of-type:has(.form-input-select[aria-expanded='true']) 
 }
 .swatch--green {
   background: var(--color-status-success);
+}
+
+.form-label-photo-grid {
+  text-align: right;
+}
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  gap: 1rem;
+}
+
+.photo-slot {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background-color: var(--color-light-3);
+  border-radius: var(--border-radius-m);
+}
+
+.photo-slot[data-slot='1'] {
+  grid-column: 1 / -1;
+  aspect-ratio: 1.5/1;
+  border-radius: var(--border-radius-l);
+}
+
+.photo-upload {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+
+  padding: 1rem;
+}
+
+.photo-upload-icon {
+  width: 50%;
+  opacity: 50%;
+  transform: translateX(8%);
+}
+
+.photo-slot[data-slot='1'] .photo-upload-icon {
+  width: 35%;
+}
+
+.form-label-photo-grid-info {
+  font-size: 0.75em;
+  font-weight: 700;
+  opacity: 70%;
+}
+
+.photo-preview {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  position: relative;
+}
+
+.photo-preview-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+}
+
+.photo-remove {
+  width: 2rem;
+  height: 2rem;
+
+  display: grid;
+  place-items: center;
+
+  position: absolute;
+  top: 0.4rem;
+  left: 0.4rem;
+
+  cursor: pointer;
+
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.55);
+  border: 0;
+  border-radius: 50rem;
+}
+
+.photo-slot[data-slot='1'] .photo-remove {
+  top: 1rem;
+  left: 1rem;
 }

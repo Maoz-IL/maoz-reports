@@ -866,3 +866,106 @@ container.addEventListener('click', (e) => {
 
   group.remove();
 });
+
+// ===========================================================
+// Photos uploader (Step 4) - fill slots by DOM order
+// ===========================================================
+
+function initPhotoGridUploader() {
+  const fileInput = document.querySelector('#photos');
+  const grid = document.querySelector('.photo-grid');
+
+  if (!fileInput || !grid) return;
+
+  const slots = Array.from(grid.querySelectorAll('.photo-slot'));
+  const MAX = slots.length;
+
+  // ✅ מערך קבוע לפי כמות slots: כל תא הוא File או null
+  let slotFiles = Array(MAX).fill(null);
+
+  const clearInputValue = () => {
+    fileInput.value = '';
+  };
+
+  const setInputFiles = () => {
+    // Note: input.files לא יכול להכיל "חורים" (null),
+    // לכן אנחנו שולחים רק את הקבצים הקיימים. הסדר בטופס יהיה קומפקטי.
+    const dt = new DataTransfer();
+    slotFiles.forEach((f) => {
+      if (f) dt.items.add(f);
+    });
+    fileInput.files = dt.files;
+  };
+
+  const render = () => {
+    slots.forEach((slot, i) => {
+      const uploadBtn = slot.querySelector('[data-upload]');
+      const preview = slot.querySelector('[data-preview]');
+      const img = slot.querySelector('.photo-preview-img');
+
+      const file = slotFiles[i];
+
+      if (file) {
+        if (uploadBtn) uploadBtn.hidden = true;
+        if (preview) preview.hidden = false;
+
+        if (img) {
+          const url = URL.createObjectURL(file);
+          img.src = url;
+          img.onload = () => URL.revokeObjectURL(url);
+        }
+      } else {
+        if (uploadBtn) uploadBtn.hidden = false;
+        if (preview) preview.hidden = true;
+
+        if (img) img.removeAttribute('src');
+      }
+    });
+
+    setInputFiles();
+  };
+
+  const addFiles = (newFiles) => {
+    const incoming = Array.from(newFiles).filter(
+      (f) => f && f.type && f.type.startsWith('image/'),
+    );
+
+    if (!incoming.length) return;
+
+    for (const file of incoming) {
+      const emptyIndex = slotFiles.findIndex((x) => x === null);
+      if (emptyIndex === -1) break; // אין מקום
+      slotFiles[emptyIndex] = file; // ✅ ממלא את ה-slot הפנוי הבא
+    }
+
+    render();
+  };
+
+  const removeAt = (slotIndex) => {
+    if (slotIndex < 0 || slotIndex >= MAX) return;
+    slotFiles[slotIndex] = null; // ✅ מפנה רק את המשבצת הזאת, בלי להזיז אחרות
+    render();
+  };
+
+  fileInput.addEventListener('change', (e) => {
+    addFiles(e.target.files);
+    clearInputValue();
+  });
+
+  grid.addEventListener('click', (e) => {
+    const btn = e.target.closest('.photo-remove');
+    if (!btn) return;
+
+    const slot = btn.closest('.photo-slot');
+    if (!slot) return;
+
+    const slotIndex = slots.indexOf(slot);
+    if (slotIndex === -1) return;
+
+    removeAt(slotIndex);
+  });
+
+  render();
+}
+
+initPhotoGridUploader();
