@@ -969,3 +969,40 @@ function initPhotoGridUploader() {
 }
 
 initPhotoGridUploader();
+
+// ===========================================================
+// Header shadow
+// ===========================================================
+
+function initHeaderShadowAfterPassingTitle() {
+  const header = document.querySelector('header');
+  const title = document.querySelector('.main-title');
+
+  if (!header || !title) return;
+
+  let ticking = false;
+
+  const update = () => {
+    const h = header.getBoundingClientRect();
+    const t = title.getBoundingClientRect();
+
+    // מרגע שהחלק התחתון של ה-header עבר את החלק התחתון של הכותרת
+    const hasPassedTitle = h.bottom >= t.bottom;
+
+    header.classList.toggle('has-shadow', hasPassedTitle);
+    ticking = false;
+  };
+
+  const onScrollOrResize = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(update);
+  };
+
+  window.addEventListener('scroll', onScrollOrResize, { passive: true });
+  window.addEventListener('resize', onScrollOrResize);
+
+  update();
+}
+
+initHeaderShadowAfterPassingTitle();
