@@ -1006,3 +1006,35 @@ function initHeaderShadowAfterPassingTitle() {
 }
 
 initHeaderShadowAfterPassingTitle();
+
+// =====================================
+// Modals
+// =====================================
+
+function initCancelModal() {
+  const cancelBtn = document.querySelector('.btn-cancel'); // אם יש לך class אחר – תחליף
+  const dialog = document.querySelector('#cancelModal');
+  const confirmBtn = document.querySelector('#btnConfirmCancel');
+
+  if (!cancelBtn || !dialog || !confirmBtn) return;
+
+  cancelBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    dialog.showModal();
+  });
+
+  // אם המשתמש לחץ על "כן, מחק טופס"
+  confirmBtn.addEventListener('click', (e) => {
+    // הדיאלוג ייסגר אוטומטית כי זה submit בתוך method="dialog"
+    // אבל אנחנו רוצים גם רענון:
+    // נותנים לדפדפן לסגור ואז מרעננים
+    setTimeout(() => window.location.reload(), 0);
+  });
+
+  // סגירה בלחיצה על הרקע (אופציונלי אבל נוח)
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+}
+
+initCancelModal();

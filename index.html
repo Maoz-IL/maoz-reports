@@ -1387,5 +1387,26 @@
         </ol>
       </div>
     </footer>
+
+    <dialog class="modal" id="cancelModal" aria-labelledby="cancelModalTitle">
+      <form method="dialog" class="modal__panel">
+        <h2 class="modal__title" id="cancelModalTitle">
+          האם למחוק את הטופס ולרענן את הדף?
+        </h2>
+        <div class="modal__actions">
+          <button class="btn btn-primary" value="cancel" type="submit">
+            לא, קח אותי בחזרה לטופס
+          </button>
+          <button
+            class="btn btn-secondary btn-cancel btn-secondary-cancel"
+            id="btnConfirmCancel"
+            value="confirm"
+            type="submit"
+          >
+            כן, מחק את הטופס
+          </button>
+        </div>
+      </form>
+    </dialog>
   </body>
 </html>

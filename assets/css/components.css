@@ -1,5 +1,6 @@
 @import url('/assets/css/base.css');
 @import url('/assets/css/brand.css');
+@import url('/assets/css/components/modals.css');
 
 /* =======
    Buttons
@@ -11,13 +12,17 @@
   align-items: center;
 
   font-weight: 700;
+}
 
-  border-radius: var(--border-radius-m);
+.btn-primary,
+.btn-secondary {
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--border-radius-s);
 }
 
 .btn-primary {
-  background-color: var(--color-primary-1);
   color: var(--color-light-1);
+  background-color: var(--color-primary-1);
 }
 
 .btn-secondary {
@@ -27,8 +32,6 @@
 
 .btn-cancel {
   font-size: 0.85rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--border-radius-s);
 }
 
 .btn-primary-cancel {
@@ -41,8 +44,8 @@
 }
 
 .btn-cancel .x-mark-icon {
-  width: 0.65rem;
-  margin-left: 2.5px;
+  width: 0.6rem;
+  margin-left: 2.75px;
 }
 
 .btn-add-work-type-field {
@@ -120,6 +123,11 @@ footer {
 
 .footer-button-group button {
   grid-area: 1/1;
+}
+
+.footer-button-prev,
+.footer-button-next {
+  border-radius: var(--border-radius-m);
 }
 
 .footer-button-prev {
