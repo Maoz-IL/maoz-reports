@@ -474,7 +474,7 @@ function renderSelectOptions(menuEl, options, config = {}) {
 
     li.innerHTML = `
       <span class="option-image-text-group">
-        ${img ? `<img class="option-image" src="${img}" alt="${alt}" loading="lazy" decoding="async">` : ''}
+        ${img ? `<img class="option-image" src="${img}" alt="${alt}" decoding="async">` : ''}
         <span class="option-text">${label}</span>
       </span>
       ${meta ? `<span class="option-role">${meta}</span>` : ''}
