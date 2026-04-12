@@ -22,20 +22,148 @@ const scrollToTop = () => {
 
 let currentStep = formSteps.findIndex((step) => step.classList.contains('current-step'));
 
-btnNext.addEventListener('click', () => {
+// ================================
+// Step validation + Next button UI
+// ================================
+
+const formEl = document.querySelector('form');
+
+const nextIncompleteEl = btnNext.querySelector('.incomplete');
+const nextCompleteEl = btnNext.querySelector('.complete');
+
+const lastStepIndex = formSteps.length - 1;
+
+function isCurrentStepValid() {
+  const fs = formSteps[currentStep];
+  if (!fs) return false;
+
+  // 1) בדיקה רגילה של הדפדפן
+  const nativeOk = fs.checkValidity();
+
+  // 2) השלמה: hidden required (כי HTML לא מאמת אותם)
+  const requiredHidden = Array.from(
+    fs.querySelectorAll('input[type="hidden"][required]:not([disabled])'),
+  ).filter((el) => !el.closest('[hidden]'));
+
+  const hiddenOk = requiredHidden.every((el) => String(el.value || '').trim() !== '');
+
+  // 3) השלמה: date required (כדי לתפוס "ניקוי" שלא תמיד נתפס)
+  const requiredDates = Array.from(
+    fs.querySelectorAll('input[type="date"][required]:not([disabled])'),
+  ).filter((el) => !el.closest('[hidden]'));
+
+  const dateOk = requiredDates.every((el) => {
+    return String(el.value || '').trim() !== '' && el.valueAsDate !== null;
+  });
+
+  // 4) ✅ השלמה: required “טקסטואלי” (כמו כתובת) + textarea/select/number
+  //    מונע מצב שבו ריק/רווחים עדיין נותן לעבור
+  const requiredTextLike = Array.from(
+    fs.querySelectorAll(
+      'input[required]:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([disabled]), textarea[required]:not([disabled]), select[required]:not([disabled])',
+    ),
+  ).filter((el) => !el.closest('[hidden]'));
+
+  const textOk = requiredTextLike.every((el) => {
+    const v = String(el.value ?? '');
+    // date/number: ריק = לא תקין. טקסט: trim
+    return el.type === 'number' || el.type === 'date' ? v !== '' : v.trim() !== '';
+  });
+
+  return nativeOk && hiddenOk && dateOk && textOk;
+}
+
+function updateNextButtonUI() {
+  const isLast = currentStep === lastStepIndex;
+  const valid = isCurrentStepValid();
+
+  // בשלב האחרון: הכפתור נהיה submit
+  btnNext.type = isLast ? 'submit' : 'button';
+
+  // עדכון טקסט "המשך"/"שלח טופס"
+  if (nextCompleteEl) nextCompleteEl.textContent = isLast ? 'שלח טופס' : 'המשך';
+
+  // disabled + החלפת הטקסטים
+  btnNext.disabled = !valid;
+  if (nextIncompleteEl) nextIncompleteEl.hidden = valid;
+  if (nextCompleteEl) nextCompleteEl.hidden = !valid;
+}
+
+function onFormMutate(e) {
+  const fs = formSteps[currentStep];
+  if (!fs) return;
+  if (!fs.contains(e.target)) return;
+  updateNextButtonUI();
+}
+
+// input/change על כל הטופס (capture), אבל אנחנו מסננים רק לשלב הנוכחי
+formEl.addEventListener('input', onFormMutate, true);
+formEl.addEventListener('change', onFormMutate, true);
+
+// הרצה ראשונית
+updateNextButtonUI();
+
+function focusFirstInvalidInCurrentStep() {
+  const fs = formSteps[currentStep];
+  if (!fs) return;
+
+  // קודם תן לדפדפן להראות הודעות על שדות רגילים
+  if (!fs.checkValidity()) {
+    fs.reportValidity();
+    return;
+  }
+
+  // אם הגענו לפה, הבעיה היא hidden required
+  const firstEmptyHidden = Array.from(
+    fs.querySelectorAll('input[type="hidden"][required]:not([disabled])'),
+  ).find((el) => !el.closest('[hidden]') && String(el.value || '').trim() === '');
+
+  if (!firstEmptyHidden) return;
+
+  // נסה למצוא את ה-combobox באותו form-field ולפקס אליו
+  const field = firstEmptyHidden.closest('.form-field');
+  const combo = field?.querySelector('[role="combobox"]');
+
+  if (combo) combo.focus();
+}
+
+// ===============
+// Step Navigation
+// ===============
+
+btnNext.addEventListener('click', (e) => {
+  // אם אנחנו בשלב האחרון, זה submit — לא מתקדמים ידנית כאן
+  if (currentStep === lastStepIndex) return;
+
+  // אם לא תקין, מציג הודעות דפדפן ומונע מעבר
+  if (!isCurrentStepValid()) {
+    e.preventDefault();
+    focusFirstInvalidInCurrentStep();
+    return;
+  }
+
+  // מעבר שלב רגיל
   if (currentStep < formSteps.length - 1) {
     scrollToTop();
 
     formSteps[currentStep].classList.remove('current-step');
+    footerStageIndicator[currentStep].classList.remove('current-step');
 
     currentStep += 1;
+
     formSteps[currentStep].classList.add('current-step');
     footerStageIndicator[currentStep].classList.add('current-step');
-    titleStageIndicator.style.transform = `translateY(-${titleStageIndicatorItem.getBoundingClientRect().height * currentStep}px)`;
+
+    titleStageIndicator.style.transform = `translateY(-${
+      titleStageIndicatorItem.getBoundingClientRect().height * currentStep
+    }px)`;
 
     if (currentStep >= 1) {
       btnNext.style.width = 'calc(85% - 0.5rem)';
     }
+
+    // חשוב
+    updateNextButtonUI();
   }
 });
 
@@ -63,6 +191,22 @@ btnPrev.addEventListener('click', () => {
     } else {
       btnNext.style.width = 'calc(85% - 0.5rem)';
     }
+  }
+
+  updateNextButtonUI();
+});
+
+formEl.addEventListener('submit', (e) => {
+  // אם אנחנו לא בשלב האחרון, לא אמור להיות submit בכלל
+  if (currentStep !== lastStepIndex) {
+    e.preventDefault();
+    return;
+  }
+
+  // ולידציה לשלב האחרון (אפשר גם לכל הטופס אם תרצה בעתיד)
+  if (!isCurrentStepValid()) {
+    e.preventDefault();
+    formSteps[currentStep].reportValidity();
   }
 });
 
@@ -371,6 +515,7 @@ function initMultiSelect(root) {
 
     updateButtonText();
     syncHiddenInput();
+    base.hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
     renderChips();
     // לא סוגרים את התפריט בבחירה
   };
@@ -409,6 +554,7 @@ function initMultiSelect(root) {
 
       updateButtonText();
       syncHiddenInput();
+      base.hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
       renderChips();
     });
   }
@@ -416,6 +562,7 @@ function initMultiSelect(root) {
   // init מצב התחלתי
   updateButtonText();
   syncHiddenInput();
+  base.hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
   renderChips();
 
   const reset = () => {
@@ -428,6 +575,7 @@ function initMultiSelect(root) {
 
     updateButtonText();
     syncHiddenInput();
+    base.hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
     renderChips();
 
     // (רשות) סגור את התפריט אם פתוח
@@ -604,6 +752,10 @@ function initConditionalFollowups() {
       setRequiredInArea(target, shouldShow);
 
       if (!shouldShow) resetFollowupsArea(target);
+
+      // ✅ חשוב: לעדכן את מצב כפתור "המשך" אחרי שה-required השתנה
+      // (ה-change על הטופס רץ לפני apply בגלל capture)
+      queueMicrotask(() => updateNextButtonUI());
     };
 
     hidden.addEventListener('change', apply);
@@ -866,6 +1018,27 @@ container.addEventListener('click', (e) => {
 
   group.remove();
 });
+
+function ensureFirstWorkTypeGroup() {
+  if (!container || !tpl) return;
+
+  // אם כבר יש בלוק אחד – לא עושים כלום
+  if (container.children.length > 0) return;
+
+  const index = 1;
+  const group = tpl.content.firstElementChild.cloneNode(true);
+
+  suffixIdsByName(group, index);
+  resetNewGroup(group);
+
+  // הראשון יהיה למטה (מבחינה כרונולוגית 1)
+  container.appendChild(group);
+
+  initWorkTypeGroup(group);
+}
+
+// להפעיל פעם אחת בטעינה:
+ensureFirstWorkTypeGroup();
 
 // ===========================================================
 // Photos uploader (Step 4) - fill slots by DOM order

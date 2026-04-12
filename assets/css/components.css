@@ -148,13 +148,12 @@ footer {
   justify-self: end;
 
   width: 100%;
+  z-index: 1;
   padding: 1rem 0;
 
-  transition: width 700ms ease;
-}
-
-.footer-button-next .incomplete {
-  display: none;
+  transition:
+    width 700ms ease,
+    background-color 350ms ease;
 }
 
 .footer-button-next:not(:disabled) {
