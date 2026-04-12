@@ -992,6 +992,19 @@ const btnAdd = document.querySelector('.btn-add-work-type-field');
 const container = document.querySelector('[data-work-type-container]');
 const tpl = document.querySelector('#template-work-type-group');
 
+function syncWorkTypeRemoveButtons() {
+  if (!container) return;
+
+  const groups = container.querySelectorAll('.form-fields-group-work-type');
+  const canRemove = groups.length > 1;
+
+  groups.forEach((group) => {
+    const btn = group.querySelector('.btn-remove-work-type');
+    if (!btn) return;
+    btn.hidden = !canRemove; // כשיש רק אחד -> מוסתר
+  });
+}
+
 if (btnAdd && container && tpl) {
   btnAdd.addEventListener('click', (e) => {
     e.preventDefault();
@@ -1004,6 +1017,7 @@ if (btnAdd && container && tpl) {
 
     container.prepend(group);
     initWorkTypeGroup(group);
+    syncWorkTypeRemoveButtons();
   });
 } else {
   console.warn('Missing btnAdd/container/template:', { btnAdd, container, tpl });
@@ -1013,10 +1027,14 @@ container.addEventListener('click', (e) => {
   const btn = e.target.closest('.btn-remove-work-type');
   if (!btn) return;
 
+  const groups = container.querySelectorAll('.form-fields-group-work-type');
+  if (groups.length <= 1) return; // ✅ לא מאפשר להסיר את האחרון
+
   const group = btn.closest('.form-fields-group-work-type');
   if (!group) return;
 
   group.remove();
+  syncWorkTypeRemoveButtons();
 });
 
 function ensureFirstWorkTypeGroup() {
@@ -1035,10 +1053,12 @@ function ensureFirstWorkTypeGroup() {
   container.appendChild(group);
 
   initWorkTypeGroup(group);
+  syncWorkTypeRemoveButtons();
 }
 
 // להפעיל פעם אחת בטעינה:
 ensureFirstWorkTypeGroup();
+syncWorkTypeRemoveButtons();
 
 // ===========================================================
 // Photos uploader (Step 4) - fill slots by DOM order
