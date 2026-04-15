@@ -6,6 +6,7 @@ import { workHourTypes } from '../data/workHourTypes.js';
 import { treeTypes } from '../data/treeTypes.js';
 import { treeBindTypes } from '../data/treeBindTypes.js';
 
+const form = document.querySelector('form');
 const formSteps = [...document.querySelectorAll('.steps > fieldset')];
 const titleStageIndicator = document.querySelector(
   '.main-title-stage-indicator .container',
@@ -1174,35 +1175,110 @@ function initCancelModal() {
 
 initCancelModal();
 
+// ===========================================================
+// Multi-submit helpers (one payload per work-type group)
+// ===========================================================
+
+function isSuccessfulControl(el) {
+  if (!el || !el.name || el.disabled) return false;
+  if (el.type === 'submit' || el.type === 'button') return false;
+  if ((el.type === 'checkbox' || el.type === 'radio') && !el.checked) return false;
+  return true;
+}
+
+function appendControlToFormData(fd, el) {
+  if (!isSuccessfulControl(el)) return;
+
+  // file inputs אחרים (אם יהיו)
+  if (el.type === 'file') {
+    Array.from(el.files || []).forEach((f) => fd.append(el.name, f, f.name));
+    return;
+  }
+
+  // select multiple
+  if (el.tagName === 'SELECT' && el.multiple) {
+    Array.from(el.selectedOptions).forEach((opt) => fd.append(el.name, opt.value));
+    return;
+  }
+
+  fd.append(el.name, el.value);
+}
+
+function buildBaseFormData(form, workTypeGroups) {
+  const fd = new FormData();
+  const controls = form.querySelectorAll('input, select, textarea');
+
+  controls.forEach((el) => {
+    // אל תכלול שדות שנמצאים בתוך אף בלוק של "סוג עבודה"
+    const insideWorkType = workTypeGroups.some((g) => g.contains(el));
+    if (insideWorkType) return;
+
+    appendControlToFormData(fd, el);
+  });
+
+  return fd;
+}
+
+function appendWorkTypeGroup(fd, group) {
+  const controls = group.querySelectorAll('input, select, textarea');
+  controls.forEach((el) => appendControlToFormData(fd, el));
+}
+
 // =================================
 // Testing
 // =================================
 
-const form = document.querySelector('form');
-
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const fd = new FormData(form);
+  // אוסף את כל בלוקי "סוג עבודה" שהמשתמש יצר
+  const workTypeGroups = Array.from(
+    document.querySelectorAll('.form-fields-group-work-type'),
+  );
 
-  // נקה את מה שמגיע מה-input הריק (אם קיים)
-  fd.delete('photos[]');
-
-  // ✅ הוסף קבצים מה-API
-  const photos = photosApi?.getFiles?.() ?? [];
-  photos.forEach((file) => fd.append('photos[]', file, file.name));
-
-  console.group('📤 FormData payload');
-  for (const [key, value] of fd.entries()) {
-    if (value instanceof File) {
-      console.log(key, { name: value.name, type: value.type, size: value.size });
-    } else {
-      console.log(key, value);
-    }
+  if (workTypeGroups.length === 0) {
+    console.warn('No work-type groups found.');
+    return;
   }
-  console.groupEnd();
+
+  // בסיס: כל הטופס חוץ מהבלוקים של סוג עבודה
+  const baseFd = buildBaseFormData(form, workTypeGroups);
+
+  // תמונות: זהה בכל שליחה
+  const photos = photosApi?.getFiles?.() ?? [];
+
+  // אם אתה רק רוצה “לראות” ולא לשלוח כרגע — השאר את זה ככה.
+  // אם בעתיד תרצה לשלוח באמת, תחליף/תוסיף fetch בתוך הלולאה.
+  for (let i = 0; i < workTypeGroups.length; i++) {
+    const group = workTypeGroups[i];
+
+    // בונים FormData חדש לכל “שליחה”
+    const fd = new FormData();
+    for (const [k, v] of baseFd.entries()) fd.append(k, v);
+
+    // מוסיפים רק את הבלוק הנוכחי של סוג עבודה
+    appendWorkTypeGroup(fd, group);
+
+    // מוסיפים תמונות (אותן תמונות בכל payload)
+    fd.delete('photos[]'); // ביטחון
+    photos.forEach((file) => fd.append('photos[]', file, file.name));
+
+    // ---------- DEBUG: הדפסה מסודרת לכל payload ----------
+    console.group(`📤 Payload #${i + 1}/${workTypeGroups.length}`);
+    for (const [key, value] of fd.entries()) {
+      if (value instanceof File) {
+        console.log(key, { name: value.name, type: value.type, size: value.size });
+      } else {
+        console.log(key, value);
+      }
+    }
+    console.groupEnd();
+
+    // ---------- שליחה אמיתית (כשתהיה כתובת API) ----------
+    // await fetch('/your-endpoint', { method: 'POST', body: fd });
+  }
 
   console.table(
-    photos.map((f, i) => ({ i: i + 1, name: f.name, type: f.type, size: f.size })),
+    photos.map((f, idx) => ({ i: idx + 1, name: f.name, type: f.type, size: f.size })),
   );
 });
