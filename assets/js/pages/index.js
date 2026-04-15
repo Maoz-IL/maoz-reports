@@ -6,7 +6,7 @@ import { workHourTypes } from '../data/workHourTypes.js';
 import { treeTypes } from '../data/treeTypes.js';
 import { treeBindTypes } from '../data/treeBindTypes.js';
 
-const formSteps = [...document.querySelectorAll('form fieldset')];
+const formSteps = [...document.querySelectorAll('.steps > fieldset')];
 const titleStageIndicator = document.querySelector(
   '.main-title-stage-indicator .container',
 );
@@ -77,9 +77,6 @@ function updateNextButtonUI() {
   const isLast = currentStep === lastStepIndex;
   const valid = isCurrentStepValid();
 
-  // בשלב האחרון: הכפתור נהיה submit
-  btnNext.type = isLast ? 'submit' : 'button';
-
   // עדכון טקסט "המשך"/"שלח טופס"
   if (nextCompleteEl) nextCompleteEl.textContent = isLast ? 'שלח טופס' : 'המשך';
 
@@ -132,8 +129,21 @@ function focusFirstInvalidInCurrentStep() {
 // ===============
 
 btnNext.addEventListener('click', (e) => {
-  // אם אנחנו בשלב האחרון, זה submit — לא מתקדמים ידנית כאן
-  if (currentStep === lastStepIndex) return;
+  // תמיד מונעים ברירת מחדל (כדי שלא יהיה submit בטעות)
+  e.preventDefault();
+
+  // אם בשלב האחרון - שולחים את הטופס בפועל
+  if (currentStep === lastStepIndex) {
+    // אם לא תקין – הצג הודעות
+    if (!isCurrentStepValid()) {
+      focusFirstInvalidInCurrentStep();
+      return;
+    }
+
+    // submit אמיתי (מפעיל את form 'submit' listener שלך)
+    formEl.requestSubmit();
+    return;
+  }
 
   // אם לא תקין, מציג הודעות דפדפן ומונע מעבר
   if (!isCurrentStepValid()) {
@@ -1086,9 +1096,14 @@ function initPhotoGridUploader() {
   });
 
   render();
+
+  return {
+    getFiles: () => slotFiles.filter(Boolean),
+    getSlotFiles: () => slotFiles.slice(),
+  };
 }
 
-initPhotoGridUploader();
+const photosApi = initPhotoGridUploader();
 
 // ===========================================================
 // Header shadow
@@ -1158,3 +1173,36 @@ function initCancelModal() {
 }
 
 initCancelModal();
+
+// =================================
+// Testing
+// =================================
+
+const form = document.querySelector('form');
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const fd = new FormData(form);
+
+  // נקה את מה שמגיע מה-input הריק (אם קיים)
+  fd.delete('photos[]');
+
+  // ✅ הוסף קבצים מה-API
+  const photos = photosApi?.getFiles?.() ?? [];
+  photos.forEach((file) => fd.append('photos[]', file, file.name));
+
+  console.group('📤 FormData payload');
+  for (const [key, value] of fd.entries()) {
+    if (value instanceof File) {
+      console.log(key, { name: value.name, type: value.type, size: value.size });
+    } else {
+      console.log(key, value);
+    }
+  }
+  console.groupEnd();
+
+  console.table(
+    photos.map((f, i) => ({ i: i + 1, name: f.name, type: f.type, size: f.size })),
+  );
+});
