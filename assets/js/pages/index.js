@@ -1228,57 +1228,58 @@ function appendWorkTypeGroup(fd, group) {
 // Testing
 // =================================
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  // אוסף את כל בלוקי "סוג עבודה" שהמשתמש יצר
+async function submitAllWorkTypePayloads({ form, photosApi }) {
   const workTypeGroups = Array.from(
     document.querySelectorAll('.form-fields-group-work-type'),
   );
 
-  if (workTypeGroups.length === 0) {
-    console.warn('No work-type groups found.');
-    return;
-  }
+  if (workTypeGroups.length === 0) return false;
 
-  // בסיס: כל הטופס חוץ מהבלוקים של סוג עבודה
+  // בסיס: כל הטופס חוץ מבלוקי סוג עבודה
   const baseFd = buildBaseFormData(form, workTypeGroups);
 
   // תמונות: זהה בכל שליחה
   const photos = photosApi?.getFiles?.() ?? [];
 
-  // אם אתה רק רוצה “לראות” ולא לשלוח כרגע — השאר את זה ככה.
-  // אם בעתיד תרצה לשלוח באמת, תחליף/תוסיף fetch בתוך הלולאה.
+  // בעתיד: תחליף את זה ל-true רק אם כל ה-fetch הצליחו
+  let allOk = true;
+
   for (let i = 0; i < workTypeGroups.length; i++) {
     const group = workTypeGroups[i];
 
-    // בונים FormData חדש לכל “שליחה”
     const fd = new FormData();
     for (const [k, v] of baseFd.entries()) fd.append(k, v);
 
-    // מוסיפים רק את הבלוק הנוכחי של סוג עבודה
     appendWorkTypeGroup(fd, group);
 
-    // מוסיפים תמונות (אותן תמונות בכל payload)
-    fd.delete('photos[]'); // ביטחון
+    // תמונות
+    fd.delete('photos[]');
     photos.forEach((file) => fd.append('photos[]', file, file.name));
 
-    // ---------- DEBUG: הדפסה מסודרת לכל payload ----------
-    console.group(`📤 Payload #${i + 1}/${workTypeGroups.length}`);
-    for (const [key, value] of fd.entries()) {
-      if (value instanceof File) {
-        console.log(key, { name: value.name, type: value.type, size: value.size });
-      } else {
-        console.log(key, value);
-      }
-    }
-    console.groupEnd();
-
-    // ---------- שליחה אמיתית (כשתהיה כתובת API) ----------
-    // await fetch('/your-endpoint', { method: 'POST', body: fd });
+    // --- בעתיד: שליחה אמיתית ---
+    // const res = await fetch('/your-endpoint', { method: 'POST', body: fd });
+    // if (!res.ok) allOk = false;
   }
 
-  console.table(
-    photos.map((f, idx) => ({ i: idx + 1, name: f.name, type: f.type, size: f.size })),
-  );
+  return allOk;
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  // (אם תרצה להשאיר) ולידציה אחרונה
+  if (!form.checkValidity()) {
+    form.reportValidity();
+    return;
+  }
+
+  const ok = await submitAllWorkTypePayloads({ form, photosApi });
+
+  // כרגע תמיד ok=true (כל עוד לא עשית fetch) — אבל זה כבר תשתית לעתיד
+  if (ok) {
+    window.location.href = './success';
+  } else {
+    // תשתית לעתיד: הודעת שגיאה במקום redirect
+    console.error('Submit failed — stay on form.');
+  }
 });
