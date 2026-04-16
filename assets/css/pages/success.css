@@ -47,3 +47,9 @@ h1 {
 .icon-verify-frame {
   stroke: var(--color-primary-3);
 }
+
+.footer-btn {
+  width: 100%;
+  padding: 1rem 0;
+  border-radius: var(--border-radius-m);
+}
