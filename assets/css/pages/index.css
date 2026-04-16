@@ -8,6 +8,10 @@ body {
   background-color: var(--color-light-2);
 }
 
+.main {
+  padding-bottom: 8rem;
+}
+
 .main-title {
   display: flex;
   justify-content: space-between;

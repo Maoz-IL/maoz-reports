@@ -96,7 +96,7 @@ header.has-shadow {
 }
 
 .header-logo {
-  width: 5.5rem;
+  width: 5rem;
 }
 
 .header-logo path {
@@ -114,6 +114,9 @@ footer {
   z-index: 1;
 
   background-color: inherit;
+}
+
+footer.has-shadow {
   box-shadow: 0 -0.25rem 1rem var(--color-shadow-layering);
 }
 

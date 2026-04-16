@@ -1,0 +1,49 @@
+@import url('/assets/css/base.css');
+@import url('/assets/css/brand.css');
+@import url('/assets/css/layout.css');
+@import url('/assets/css/components.css');
+
+body {
+  color: var(--color-light-2);
+  background-color: var(--color-dark);
+}
+
+.header-wrapper,
+.footer-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.footer-wrapper {
+  padding-bottom: 4rem;
+}
+
+.header-logo path {
+  fill: currentColor;
+}
+
+.main {
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+
+  position: absolute;
+  top: 50%;
+  transform: translateY(-57%);
+}
+
+h1 {
+  text-align: center;
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.icon-verify-frame,
+.icon-verify-check {
+  fill: none;
+}
+
+.icon-verify-frame {
+  stroke: var(--color-primary-3);
+}

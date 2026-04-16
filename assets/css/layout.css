@@ -1,15 +1,15 @@
 @import url('/assets/css/base.css');
 @import url('/assets/css/brand.css');
 
+.wrapper {
+  width: clamp(20rem, 100%, 25rem);
+  margin: 0 1.75rem;
+}
+
 .header-wrapper,
 .footer-wrapper,
 form .steps {
   padding: 1.25rem 0;
-}
-
-.wrapper {
-  width: clamp(20rem, 100%, 40rem);
-  margin: 0 1.75rem;
 }
 
 header,
@@ -18,8 +18,4 @@ footer {
   width: 100vw;
   display: flex;
   justify-content: center;
-}
-
-.main {
-  padding-bottom: 8rem;
 }
