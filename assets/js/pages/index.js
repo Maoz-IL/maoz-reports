@@ -1277,7 +1277,7 @@ form.addEventListener('submit', async (e) => {
 
   // כרגע תמיד ok=true (כל עוד לא עשית fetch) — אבל זה כבר תשתית לעתיד
   if (ok) {
-    window.location.href = './success';
+    window.location.href = '/success';
   } else {
     // תשתית לעתיד: הודעת שגיאה במקום redirect
     console.error('Submit failed — stay on form.');
