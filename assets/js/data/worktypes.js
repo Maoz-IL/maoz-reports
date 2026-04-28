@@ -1,5 +1,17 @@
 export const workTypes = [
   {
+    value: 'גיזום',
+    label: 'גיזום',
+  },
+  {
+    value: 'כריתה',
+    label: 'כריתה',
+  },
+  {
+    value: 'חישוף',
+    label: 'חישוף',
+  },
+  {
     value: 'שעת עבודה',
     label: 'שעת עבודה',
   },
@@ -8,16 +20,8 @@ export const workTypes = [
     label: 'שעת חירום',
   },
   {
-    value: 'גיזום',
-    label: 'גיזום',
-  },
-  {
     value: 'גיזום נקודתי',
     label: 'גיזום נקודתי',
-  },
-  {
-    value: 'חישוף',
-    label: 'חישוף',
   },
   {
     value: 'יום עבודת צוות גיזום',
@@ -26,10 +30,6 @@ export const workTypes = [
   {
     value: 'כבילת ענפים ברצועות',
     label: 'כבילת ענפים ברצועות',
-  },
-  {
-    value: 'כריתה',
-    label: 'כריתה',
   },
   {
     value: 'כרסום',
