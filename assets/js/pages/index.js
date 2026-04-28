@@ -777,6 +777,39 @@ function initConditionalFollowups() {
 // להפעיל אחרי שכל ה-selects אותחלו:
 initConditionalFollowups();
 
+// ===================
+// Default customer on load
+
+function setDefaultCustomer(value) {
+  const hidden = document.querySelector('input[type="hidden"][name="customer"]');
+  const field = hidden?.closest('.form-field');
+  const listbox = field?.querySelector('[role="listbox"]');
+
+  if (!hidden || !field || !listbox) return;
+
+  const opt = listbox.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`);
+
+  if (opt) {
+    // מפעיל את אותו setSelected שלך דרך מאזין ה-click
+    opt.click();
+  } else {
+    // fallback אם לא נמצא (למשל mismatch בשם)
+    const valueEl = field.querySelector('[data-select-value]');
+    hidden.value = value;
+    if (valueEl) valueEl.textContent = value;
+    hidden.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  // לוודא שכפתור "המשך" יתעדכן אחרי מילוי ברירת המחדל
+  queueMicrotask(() => updateNextButtonUI());
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // רק אם המשתמש עדיין לא בחר לקוח
+  const hidden = document.querySelector('input[type="hidden"][name="customer"]');
+  if (hidden && !hidden.value) setDefaultCustomer('עיריית פתח תקווה');
+});
+
 // ===========================================================
 // ניהול יצירת בלוקים של סוג עבודה
 // ===========================================================
