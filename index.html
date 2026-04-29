@@ -561,7 +561,6 @@
                     <ul class="form-input-select-multi-chosen"></ul>
                   </div>
                 </div>
-
                 <!-- פירוט -->
                 <div class="form-field" data-field="textarea">
                   <label class="form-label form-label-required" for="taskStatusDetails">
@@ -605,13 +604,7 @@
                       </label>
                       <div class="form-control">
                         <!-- האינפוט המוסתר שנשלח בפועל בטופס -->
-                        <input
-                          type="hidden"
-                          name="work-type"
-                          id="work-type"
-                          for="work-type__combobox"
-                          required
-                        />
+                        <input type="hidden" name="workType" id="work-type" required />
                         <!-- ה"משטח" שנלחץ כדי לפתוח -->
                         <button
                           type="button"
@@ -681,7 +674,7 @@
                         <!-- האינפוט המוסתר שנשלח בפועל בטופס -->
                         <input
                           type="hidden"
-                          name="work-hour-description"
+                          name="workHourDescription"
                           id="work-hour-description"
                           data-required-when-visible
                         />
@@ -745,7 +738,7 @@
                         <!-- האינפוט המוסתר שנשלח בפועל בטופס -->
                         <input
                           type="hidden"
-                          name="tree-type"
+                          name="treeType"
                           id="tree-type"
                           data-required-when-visible
                         />
@@ -810,7 +803,7 @@
                         <input
                           class="form-input"
                           type="number"
-                          name="trees-count"
+                          name="treesCount"
                           id="trees-count"
                           inputmode="numeric"
                           min="0"
@@ -838,7 +831,7 @@
                         <input
                           class="form-input"
                           type="number"
-                          name="tree-height"
+                          name="treeHeight"
                           id="tree-height"
                           inputmode="numeric"
                           min="0"
@@ -866,7 +859,7 @@
                         <input
                           class="form-input"
                           type="number"
-                          name="transports-count"
+                          name="transportsCount"
                           id="transports-count"
                           inputmode="numeric"
                           min="0"
@@ -893,7 +886,7 @@
                         <!-- האינפוט המוסתר שנשלח בפועל בטופס -->
                         <input
                           type="hidden"
-                          name="tree-bind-type"
+                          name="treeBindType"
                           id="tree-bind-type"
                           data-required-when-visible
                         />
@@ -958,7 +951,7 @@
                         <input
                           class="form-input"
                           type="number"
-                          name="tree-bind-length"
+                          name="treeBindLength"
                           id="tree-bind-length"
                           inputmode="numeric"
                           min="0"
@@ -981,7 +974,7 @@
                         <!-- האינפוט המוסתר שנשלח בפועל בטופס -->
                         <input
                           type="hidden"
-                          name="tree-stump-for-charge"
+                          name="treeStumpForCharge"
                           id="tree-stump-for-charge"
                           data-required-when-visible
                         />
@@ -1067,7 +1060,7 @@
                       <div class="form-control">
                         <textarea
                           class="form-input"
-                          name="work-type-details"
+                          name="workTypeDetails"
                           id="work-type-details"
                           rows="6"
                           data-required-when-visible
@@ -1091,7 +1084,7 @@
                       <div class="form-control">
                         <textarea
                           class="form-input"
-                          name="work-type-notes"
+                          name="workTypeNotes"
                           id="work-type-notes"
                           rows="6"
                           data-required-when-visible
@@ -1109,7 +1102,7 @@
                 type="file"
                 id="photos"
                 class="photo-input"
-                name="photos[]"
+                name="photos"
                 accept="image/*"
                 multiple
                 hidden
