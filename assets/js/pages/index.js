@@ -1,3 +1,7 @@
+// =============================================
+// Imports
+// =============================================
+
 import { workers } from '../data/workers.js';
 import { vehicles } from '../data/vehicles.js';
 import { customers } from '../data/customers.js';
@@ -5,6 +9,10 @@ import { workTypes } from '../data/workTypes.js';
 import { workHourTypes } from '../data/workHourTypes.js';
 import { treeTypes } from '../data/treeTypes.js';
 import { treeBindTypes } from '../data/treeBindTypes.js';
+import { FB_OBJECT, FB_FIELDS } from '../fireberry.schema.js';
+import { APP_FLAGS, ROUTES } from '../router.js';
+
+// =============================================
 
 const form = document.querySelector('form');
 const formSteps = [...document.querySelectorAll('.steps > fieldset')];
@@ -912,7 +920,7 @@ function initWorkTypeGroup(groupEl) {
 
   // 3) Conditional followups בתוך הבלוק (scoped!)
   const followups = groupEl.querySelector('.work-type-followups');
-  const workTypeHidden = groupEl.querySelector('input[type="hidden"][name="work-type"]');
+  const workTypeHidden = groupEl.querySelector('input[type="hidden"][name="workType"]');
 
   if (!followups || !workTypeHidden) return;
 
@@ -1286,8 +1294,8 @@ async function submitAllWorkTypePayloads({ form, photosApi }) {
     appendWorkTypeGroup(fd, group);
 
     // תמונות
-    fd.delete('photos[]');
-    photos.forEach((file) => fd.append('photos[]', file, file.name));
+    fd.delete('photos');
+    photos.forEach((file) => fd.append('photos', file, file.name));
 
     // --- בעתיד: שליחה אמיתית ---
     // const res = await fetch('/your-endpoint', { method: 'POST', body: fd });
@@ -1297,22 +1305,129 @@ async function submitAllWorkTypePayloads({ form, photosApi }) {
   return allOk;
 }
 
+// ===============================================
+// Fireberry payload builder (one record)
+
+function formDataToObject(fd) {
+  const obj = {};
+
+  for (const [key, value] of fd.entries()) {
+    // מדלגים על קבצים כאן (מטופלים בנפרד)
+    if (value instanceof File) continue;
+
+    if (obj[key] === undefined) obj[key] = value;
+    else obj[key] = Array.isArray(obj[key]) ? [...obj[key], value] : [obj[key], value];
+  }
+  return obj;
+}
+
+function buildFireberryPayload({ baseFd, workTypeGroupFd, photos = [] }) {
+  // baseFd = כל השדות הכלליים (ללא workType group)
+  // workTypeGroupFd = השדות של בלוק סוג עבודה אחד בלבד
+  const baseObj = formDataToObject(baseFd);
+  const groupObj = formDataToObject(workTypeGroupFd);
+
+  // מאחדים (group override אם יש התנגשות, לרוב אין)
+  const merged = { ...baseObj, ...groupObj };
+
+  // ממפים ל-fieldName של Fireberry
+  const fields = {};
+
+  for (const [formKey, formValue] of Object.entries(merged)) {
+    const fbFieldName = FB_FIELDS[formKey];
+
+    if (!fbFieldName) continue; // אם אין mapping – מדלגים
+
+    if (formKey === 'treeBindLength') {
+      const raw = String(formValue ?? '').trim();
+      if (raw) {
+        const n = Number(raw);
+        // אם זה מספר תקין:
+        if (!Number.isNaN(n)) {
+          const unit = n === 1 ? 'מטר' : 'מטרים';
+          fields[fbFieldName] = `${n} ${unit}`;
+        } else {
+          // fallback: אם זה לא מספר (נדיר בשדה number), שלח כמו שהוא + יחידה ברבים
+          fields[fbFieldName] = `${raw} מטרים`;
+        }
+      }
+      continue;
+    }
+
+    // נרמול בסיסי:
+    // מספרים שהגיעו כמחרוזת -> מספר
+    // (אפשר להרחיב לפי הצורך)
+    if (
+      formKey === 'treesCount' ||
+      formKey === 'treeHeight' ||
+      formKey === 'transportsCount'
+    ) {
+      const n = Number(formValue);
+      if (!Number.isNaN(n)) fields[fbFieldName] = n;
+      continue;
+    }
+
+    // כל השאר כטקסט/מחרוזת כפי שנשלח
+    fields[fbFieldName] = formValue;
+  }
+
+  // תמונות: בשלב זה רק מצמידים “מטא” (שמות/גדלים) כדי לראות שהכול זמין.
+  // בפועל העלאה ל-Fireberry בדרך כלל תדרוש endpoint/מנגנון attachment ייעודי.
+  if (photos.length) {
+    // נשמור metadata בשדה התמונות (או בשדה טקסט אחר לבדיקות),
+    // כרגע המטרה היא לראות שהקבצים קיימים בזמן submit.
+    const fbPhotosField = FB_FIELDS.photos;
+    if (fbPhotosField) {
+      fields[fbPhotosField] = photos.map((f) => ({
+        name: f.name,
+        type: f.type,
+        size: f.size,
+      }));
+    }
+  }
+
+  return {
+    objectCode: FB_OBJECT,
+    fields,
+  };
+}
+
+// ===============================================
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  // (אם תרצה להשאיר) ולידציה אחרונה
-  if (!form.checkValidity()) {
-    form.reportValidity();
-    return;
-  }
+  const workTypeGroups = Array.from(
+    document.querySelectorAll('.form-fields-group-work-type'),
+  );
+  if (workTypeGroups.length === 0) return;
 
-  const ok = await submitAllWorkTypePayloads({ form, photosApi });
+  // 1) בונים base FormData כמו שכבר עשית
+  const baseFd = buildBaseFormData(form, workTypeGroups);
 
-  // כרגע תמיד ok=true (כל עוד לא עשית fetch) — אבל זה כבר תשתית לעתיד
-  if (ok) {
-    window.location.href = '/success';
-  } else {
-    // תשתית לעתיד: הודעת שגיאה במקום redirect
-    console.error('Submit failed — stay on form.');
+  // 2) תמונות מה-uploader API הנקי שלך
+  const photos = photosApi?.getFiles?.() ?? [];
+
+  // 3) עבור כל בלוק סוג עבודה – מייצרים payload אחד
+  const payloads = workTypeGroups.map((group) => {
+    const groupFd = new FormData();
+    group.querySelectorAll('input, select, textarea').forEach((el) => {
+      appendControlToFormData(groupFd, el);
+    });
+
+    return buildFireberryPayload({
+      baseFd,
+      workTypeGroupFd: groupFd,
+      photos,
+    });
+  });
+
+  // ✅ בשלב הזה אתה יכול לראות ב-Console payloads מסודרים
+  // (אם אתה עושה redirect מיד, תראה אותם רק רגע; אפשר גם להציג על המסך/להוריד JSON)
+  console.log('Fireberry payloads:', payloads);
+
+  // TODO בהמשך: לשלוח לשרתון שלך -> Fireberry, ורק אם OK להפנות:
+  if (APP_FLAGS.redirectOnSubmit) {
+    window.location.href = ROUTES.success;
   }
 });
