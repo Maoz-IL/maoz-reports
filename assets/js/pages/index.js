@@ -1333,36 +1333,45 @@ function buildFireberryPayload({ baseFd, workTypeGroupFd, photos = [] }) {
   // ממפים ל-fieldName של Fireberry
   const fields = {};
 
+  // שליחת ערכים מספריים כטקסט בצירוף יחיד/רבים
+  const formatCountWithUnit = (rawValue, singular, plural) => {
+    const raw = String(rawValue ?? '').trim();
+    if (raw === '') return null;
+
+    const n = Number(raw);
+    if (!Number.isNaN(n)) {
+      const unit = n === 1 ? singular : plural;
+      return `${n} ${unit}`;
+    }
+
+    // fallback אם זה לא מספר (נדיר בשדה number)
+    return `${raw} ${plural}`;
+  };
+
   for (const [formKey, formValue] of Object.entries(merged)) {
     const fbFieldName = FB_FIELDS[formKey];
 
     if (!fbFieldName) continue; // אם אין mapping – מדלגים
 
-    if (formKey === 'treeBindLength') {
-      const raw = String(formValue ?? '').trim();
-      if (raw) {
-        const n = Number(raw);
-        // אם זה מספר תקין:
-        if (!Number.isNaN(n)) {
-          const unit = n === 1 ? 'מטר' : 'מטרים';
-          fields[fbFieldName] = `${n} ${unit}`;
-        } else {
-          // fallback: אם זה לא מספר (נדיר בשדה number), שלח כמו שהוא + יחידה ברבים
-          fields[fbFieldName] = `${raw} מטרים`;
-        }
-      }
+    if (formKey === 'treeBindLength' || formKey === 'treeHeight') {
+      const formatted = formatCountWithUnit(formValue, 'מטר', 'מטרים');
+      if (formatted !== null) fields[fbFieldName] = formatted;
+      continue;
+    }
+
+    if (formKey === 'transportsCount') {
+      const formatted = formatCountWithUnit(formValue, 'הובלה', 'הובלות');
+      if (formatted !== null) fields[fbFieldName] = formatted;
       continue;
     }
 
     // נרמול בסיסי:
     // מספרים שהגיעו כמחרוזת -> מספר
     // (אפשר להרחיב לפי הצורך)
-    if (
-      formKey === 'treesCount' ||
-      formKey === 'treeHeight' ||
-      formKey === 'transportsCount'
-    ) {
-      const n = Number(formValue);
+    if (formKey === 'treesCount') {
+      const raw = String(formValue ?? '').trim();
+      if (raw === '') continue;
+      const n = Number(raw);
       if (!Number.isNaN(n)) fields[fbFieldName] = n;
       continue;
     }
