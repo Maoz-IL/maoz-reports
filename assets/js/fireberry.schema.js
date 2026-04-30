@@ -1,4 +1,5 @@
-// Fireberry Table Identifier
+// Fireberry URLs & Identifiers
+export const API_URL = '/.netlify/functions/fireberry-submit';
 export const FB_OBJECT = 'customobject1005';
 
 // Fireberry Data Types Mapping

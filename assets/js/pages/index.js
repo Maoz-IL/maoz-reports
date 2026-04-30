@@ -9,7 +9,7 @@ import { workTypes } from '../data/workTypes.js';
 import { workHourTypes } from '../data/workHourTypes.js';
 import { treeTypes } from '../data/treeTypes.js';
 import { treeBindTypes } from '../data/treeBindTypes.js';
-import { FB_OBJECT, FB_FIELDS } from '../fireberry.schema.js';
+import { API_URL, FB_OBJECT, FB_FIELDS } from '../fireberry.schema.js';
 import { APP_FLAGS, ROUTES } from '../router.js';
 
 // =============================================
@@ -1434,15 +1434,24 @@ form.addEventListener('submit', async (e) => {
     });
   });
 
-  // ✅ בשלב הזה אתה יכול לראות ב-Console payloads מסודרים
-  // (אם אתה עושה redirect מיד, תראה אותם רק רגע; אפשר גם להציג על המסך/להוריד JSON)
-  console.log(
-    'Fireberry payloads:',
-    payloads.map((p) => p.fields),
-  );
+  const DRY_RUN = true;
 
-  // TODO בהמשך: לשלוח לשרתון שלך -> Fireberry, ורק אם OK להפנות:
-  if (APP_FLAGS.redirectOnSubmit) {
-    window.location.href = ROUTES.success;
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ payloads, dryRun: DRY_RUN }),
+    });
+
+    const out = await res.json().catch(() => null);
+
+    console.log('Netlify function response:', out);
+
+    // Redirect רק אם LIVE הצליח
+    if (!DRY_RUN && out?.ok && APP_FLAGS.redirectOnSubmit) {
+      window.location.href = ROUTES.success;
+    }
+  } catch (err) {
+    console.error('Submit failed:', err);
   }
 });
