@@ -1,34 +1,39 @@
-export default async (req) => {
+exports.handler = async (event) => {
   try {
-    if (req.method !== 'POST') {
-      return new Response('Method Not Allowed', { status: 405 });
+    if (event.httpMethod !== 'POST') {
+      return { statusCode: 405, body: 'Method Not Allowed' };
     }
 
-    const { payloads, dryRun = true } = await req.json();
+    const { payloads, dryRun = true } = JSON.parse(event.body || '{}');
 
     if (!Array.isArray(payloads) || payloads.length === 0) {
-      return Response.json({ ok: false, error: 'No payloads provided' }, { status: 400 });
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ ok: false, error: 'No payloads provided' }),
+      };
     }
 
-    // ✅ Dry Run – לא שולחים ל-Fireberry, רק מחזירים דוגמה
     if (dryRun) {
-      return Response.json({
-        ok: true,
-        mode: 'dryRun',
-        count: payloads.length,
-        sample: payloads[0],
-      });
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          ok: true,
+          mode: 'dryRun',
+          count: payloads.length,
+          sample: payloads[0],
+        }),
+      };
     }
 
     const tokenId = process.env.FIREBERRY_TOKEN_ID;
     if (!tokenId) {
-      return Response.json(
-        { ok: false, error: 'Missing FIREBERRY_TOKEN_ID' },
-        { status: 500 },
-      );
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ ok: false, error: 'Missing FIREBERRY_TOKEN_ID' }),
+      };
     }
 
-    // ⚠️ עדכן אם אצלך הדומיין שונה (לפי מה שהכלי בדיקה מציג)
+    // ⚠️ עדכן לפי הדומיין המדויק שלך אם צריך
     const baseUrl = 'https://api.fireberry.com/api';
 
     const results = [];
@@ -57,11 +62,16 @@ export default async (req) => {
 
     const allOk = results.every((r) => r.ok);
 
-    return Response.json(
-      { ok: allOk, mode: 'live', count: payloads.length, results },
-      { status: allOk ? 200 : 207 },
-    );
+    return {
+      statusCode: allOk ? 200 : 207,
+      body: JSON.stringify({
+        ok: allOk,
+        mode: 'live',
+        count: payloads.length,
+        results,
+      }),
+    };
   } catch (err) {
-    return Response.json({ ok: false, error: String(err) }, { status: 500 });
+    return { statusCode: 500, body: JSON.stringify({ ok: false, error: String(err) }) };
   }
 };
