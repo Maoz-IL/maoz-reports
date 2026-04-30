@@ -1434,13 +1434,11 @@ form.addEventListener('submit', async (e) => {
     });
   });
 
-  const DRY_RUN = true;
-
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ payloads, dryRun: DRY_RUN }),
+      body: JSON.stringify({ payloads, dryRun: APP_FLAGS.dryRun }),
     });
 
     const out = await res.json().catch(() => null);
@@ -1448,7 +1446,7 @@ form.addEventListener('submit', async (e) => {
     console.log('Netlify function response:', out);
 
     // Redirect רק אם LIVE הצליח
-    if (!DRY_RUN && out?.ok && APP_FLAGS.redirectOnSubmit) {
+    if (!APP_FLAGS.dryRun && out?.ok && APP_FLAGS.redirectOnSubmit) {
       window.location.href = ROUTES.success;
     }
   } catch (err) {
