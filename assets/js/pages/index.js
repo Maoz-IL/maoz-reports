@@ -1376,6 +1376,9 @@ function buildFireberryPayload({ baseFd, workTypeGroupFd, photos = [] }) {
       continue;
     }
 
+    const raw = String(formValue ?? '').trim();
+    if (raw === '') continue;
+
     // כל השאר כטקסט/מחרוזת כפי שנשלח
     fields[fbFieldName] = formValue;
   }
@@ -1433,7 +1436,10 @@ form.addEventListener('submit', async (e) => {
 
   // ✅ בשלב הזה אתה יכול לראות ב-Console payloads מסודרים
   // (אם אתה עושה redirect מיד, תראה אותם רק רגע; אפשר גם להציג על המסך/להוריד JSON)
-  console.log('Fireberry payloads:', payloads);
+  console.log(
+    'Fireberry payloads:',
+    payloads.map((p) => p.fields),
+  );
 
   // TODO בהמשך: לשלוח לשרתון שלך -> Fireberry, ורק אם OK להפנות:
   if (APP_FLAGS.redirectOnSubmit) {
