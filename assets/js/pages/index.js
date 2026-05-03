@@ -1221,6 +1221,7 @@ initCancelModal();
 // ===========================================================
 
 function isSuccessfulControl(el) {
+  if (el.type === 'file' && el.name === 'photos') return;
   if (!el || !el.name || el.disabled) return false;
   if (el.type === 'submit' || el.type === 'button') return false;
   if ((el.type === 'checkbox' || el.type === 'radio') && !el.checked) return false;
@@ -1228,6 +1229,7 @@ function isSuccessfulControl(el) {
 }
 
 function appendControlToFormData(fd, el) {
+  if (el.type === 'file' && el.name === 'photos') return;
   if (!isSuccessfulControl(el)) return;
 
   // file inputs אחרים (אם יהיו)
@@ -1383,21 +1385,6 @@ function buildFireberryPayload({ baseFd, workTypeGroupFd, photos = [] }) {
     fields[fbFieldName] = formValue;
   }
 
-  // תמונות: בשלב זה רק מצמידים “מטא” (שמות/גדלים) כדי לראות שהכול זמין.
-  // בפועל העלאה ל-Fireberry בדרך כלל תדרוש endpoint/מנגנון attachment ייעודי.
-  if (photos.length) {
-    // נשמור metadata בשדה התמונות (או בשדה טקסט אחר לבדיקות),
-    // כרגע המטרה היא לראות שהקבצים קיימים בזמן submit.
-    const fbPhotosField = FB_FIELDS.photos;
-    if (fbPhotosField) {
-      fields[fbPhotosField] = photos.map((f) => ({
-        name: f.name,
-        type: f.type,
-        size: f.size,
-      }));
-    }
-  }
-
   return {
     objectCode: FB_OBJECT,
     fields,
@@ -1409,44 +1396,60 @@ function buildFireberryPayload({ baseFd, workTypeGroupFd, photos = [] }) {
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  const workTypeGroups = Array.from(
-    document.querySelectorAll('.form-fields-group-work-type'),
-  );
-  if (workTypeGroups.length === 0) return;
-
-  // 1) בונים base FormData כמו שכבר עשית
-  const baseFd = buildBaseFormData(form, workTypeGroups);
-
-  // 2) תמונות מה-uploader API הנקי שלך
-  const photos = photosApi?.getFiles?.() ?? [];
-
-  // 3) עבור כל בלוק סוג עבודה – מייצרים payload אחד
-  const payloads = workTypeGroups.map((group) => {
-    const groupFd = new FormData();
-    group.querySelectorAll('input, select, textarea').forEach((el) => {
-      appendControlToFormData(groupFd, el);
-    });
-
-    return buildFireberryPayload({
-      baseFd,
-      workTypeGroupFd: groupFd,
-      photos,
-    });
-  });
-
   try {
+    // 1) איסוף כל בלוקי "סוג עבודה"
+    const workTypeGroups = Array.from(
+      document.querySelectorAll('.form-fields-group-work-type'),
+    );
+
+    if (workTypeGroups.length === 0) {
+      console.warn('No work-type groups found.');
+      return;
+    }
+
+    // 2) Base FD: כל הטופס חוץ מבלוקי סוג עבודה
+    const baseFd = buildBaseFormData(form, workTypeGroups);
+
+    // 3) תמונות (פעם אחת בלבד)
+    const photos = photosApi?.getFiles?.() ?? [];
+
+    // 4) Build payloads (אחד לכל בלוק סוג עבודה)
+    const payloads = workTypeGroups.map((group) => {
+      const groupFd = new FormData();
+      group.querySelectorAll('input, select, textarea').forEach((el) => {
+        appendControlToFormData(groupFd, el);
+      });
+
+      return buildFireberryPayload({
+        baseFd,
+        workTypeGroupFd: groupFd,
+        photos, // אם השארת בפנים שימוש ל-metadata — תסיר שם, ראה הערה למטה
+      });
+    });
+
+    // 5) multipart submit: payloads + photos
+    const submitFd = new FormData();
+    submitFd.append('dryRun', String(APP_FLAGS.dryRun));
+    submitFd.append('payloads', JSON.stringify(payloads));
+
+    photos.forEach((file) => submitFd.append('photos', file, file.name));
+
+    // ⚠️ לא להוסיף Content-Type ידנית — הדפדפן מוסיף boundary
     const res = await fetch(API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ payloads, dryRun: APP_FLAGS.dryRun }),
+      body: submitFd,
     });
 
     const out = await res.json().catch(() => null);
-
     console.log('Netlify function response:', out);
 
-    // Redirect רק אם LIVE הצליח
-    if (!APP_FLAGS.dryRun && out?.ok && APP_FLAGS.redirectOnSubmit) {
+    if (!res.ok || !out) {
+      console.error('Function returned non-OK response:', res.status);
+      return;
+    }
+
+    // redirect רק במצב live ורק אם ok
+    if (!APP_FLAGS.dryRun && out.ok && APP_FLAGS.redirectOnSubmit) {
       window.location.href = ROUTES.success;
     }
   } catch (err) {

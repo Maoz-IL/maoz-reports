@@ -1,6 +1,6 @@
 export const APP_FLAGS = {
-  redirectOnSubmit: false,
-  dryRun: true,
+  redirectOnSubmit: true,
+  dryRun: false,
 };
 
 export const ROUTES = {
