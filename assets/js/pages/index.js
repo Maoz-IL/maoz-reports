@@ -1355,7 +1355,7 @@ function buildFireberryPayload({ baseFd, workTypeGroupFd, photos = [] }) {
 
     if (!fbFieldName) continue; // אם אין mapping – מדלגים
 
-    if (formKey === 'treeBindLength' || formKey === 'treeHeight') {
+    if (formKey === 'treeBindLength') {
       const formatted = formatCountWithUnit(formValue, 'מטר', 'מטרים');
       if (formatted !== null) fields[fbFieldName] = formatted;
       continue;
