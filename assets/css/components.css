@@ -406,6 +406,10 @@ fieldset .form-field:last-of-type:has(.form-input-select[aria-expanded='true']) 
   box-shadow: var(--box-shadow-1);
 }
 
+.form-input-select-menu-tree-height {
+  position: relative;
+}
+
 .form-input-select-menu-option {
   display: flex;
   justify-content: space-between;
