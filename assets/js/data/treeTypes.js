@@ -2,7 +2,6 @@ export const treeTypes = [
   { value: 'אולמוס', label: 'אולמוס' },
   { value: 'אורן', label: 'אורן' },
   { value: 'אזדרכת', label: 'אזדרכת' },
-  { value: 'אחר', label: 'אחר' },
   { value: 'אילנתה', label: 'אילנתה' },
   { value: 'אלביציה', label: 'אלביציה' },
   { value: 'אלה', label: 'אלה' },
@@ -82,4 +81,5 @@ export const treeTypes = [
   { value: 'תאנה', label: 'תאנה' },
   { value: 'תויה', label: 'תויה' },
   { value: 'תות', label: 'תות' },
+  { value: 'אחר', label: 'אחר' },
 ];
