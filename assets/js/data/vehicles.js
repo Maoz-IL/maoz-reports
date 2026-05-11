@@ -15,8 +15,8 @@ export const vehicles = [
     type: 'טרקטור',
   },
   {
-    value: 'טרקטור אוולט',
-    label: 'טרקטור אוולט',
+    value: 'טרקטור אוונט',
+    label: 'טרקטור אוונט',
     type: 'טרקטור',
   },
   {
