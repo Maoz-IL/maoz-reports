@@ -25,6 +25,11 @@ export const vehicles = [
     type: 'משאית',
   },
   {
+    value: 'רכב פרטי',
+    label: 'רכב פרטי',
+    type: 'פרטי',
+  },
+  {
     value: 'שברולט סילברדו',
     label: 'שברולט סילברדו',
     type: 'טנדר',
