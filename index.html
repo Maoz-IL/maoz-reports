@@ -757,7 +757,20 @@
                               class="form-input-select-value"
                               data-select-value
                             ></span>
+
+                            <!-- ✅ שורת חיפוש (מוסתר כברירת מחדל) -->
+                            <input
+                              class="form-input-select-search"
+                              type="search"
+                              inputmode="search"
+                              autocomplete="off"
+                              spellcheck="false"
+                              aria-label="חיפוש"
+                              data-select-search
+                              hidden
+                            />
                           </span>
+
                           <span class="form-input-icon" aria-hidden="true">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
                               <path
@@ -854,7 +867,7 @@
                         <!-- תפריט בחירה -->
                         <ul
                           class="form-input-select-menu form-input-select-single-menu form-input-select-menu-tree-height"
-                          id="tree-type__listbox"
+                          id="tree-height__listbox"
                           role="listbox"
                           tabindex="-1"
                           hidden

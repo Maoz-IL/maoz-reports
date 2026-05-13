@@ -253,10 +253,102 @@ function initSelectBase(root) {
   const listbox = root.querySelector('[role="listbox"]');
   const valueEl = root.querySelector('[data-select-value]');
   const imgEl = root.querySelector('[data-select-img]');
-  const hiddenInput = root.querySelector('input[type="hidden"]');
+  const hiddenInput = root.querySelector('input[type="hidden"][name]');
+  const searchEl = root.querySelector('[data-select-search]');
   const options = () => Array.from(listbox.querySelectorAll('[role="option"]')); // חשוב: דינמי
 
   let activeIndex = -1;
+  let selectionChangedDuringOpen = false;
+
+  const normalize = (s) =>
+    String(s ?? '')
+      .trim()
+      .toLowerCase();
+
+  const getSelectedLabel = () => {
+    // אם יש aria-selected על אופציות – הכי מדויק
+    const selectedOpt = options().find((o) => o.getAttribute('aria-selected') === 'true');
+    if (selectedOpt)
+      return (
+        selectedOpt.dataset.label ??
+        selectedOpt.dataset.value ??
+        selectedOpt.textContent ??
+        ''
+      ).trim();
+
+    // fallback: לפי hiddenInput.value
+    const v = String(hiddenInput?.value ?? '').trim();
+    if (!v) return '';
+    const match = options().find((o) => String(o.dataset.value ?? '').trim() === v);
+    return match ? (match.dataset.label ?? match.dataset.value ?? '').trim() : v;
+  };
+
+  // למצוא את ה-li של "אחר" (אנחנו מניחים שקיים כאופציה)
+  const getOtherOption = () =>
+    options().find(
+      (opt) =>
+        normalize(opt.dataset.value) === 'אחר' || normalize(opt.dataset.label) === 'אחר',
+    );
+
+  // מה נחשב "טקסט לחיפוש" עבור אופציה
+  const getOptionSearchText = (opt) => {
+    // עדיף dataset.label/value כדי לא "לאסוף" טקסטים של meta/role
+    const label = opt.dataset.label ?? '';
+    const value = opt.dataset.value ?? '';
+    const meta = opt.dataset.meta ?? '';
+    return normalize(`${label} ${value} ${meta}`);
+  };
+
+  const applyFilter = (query) => {
+    const q = normalize(query);
+    const opts = options();
+
+    // אם ריק => כולם
+    if (!q) {
+      opts.forEach((o) => (o.hidden = false));
+      return;
+    }
+
+    const other = getOtherOption();
+
+    // 1) קודם נסנן הכל לפי hit
+    let matchesNonOther = 0;
+
+    opts.forEach((opt) => {
+      const isOther =
+        normalize(opt.dataset.value) === 'אחר' || normalize(opt.dataset.label) === 'אחר';
+
+      const hit = getOptionSearchText(opt).includes(q);
+
+      if (isOther) {
+        // נטפל ב"אחר" אחרי שנדע אם יש התאמות אחרות
+        opt.hidden = true;
+        return;
+      }
+
+      opt.hidden = !hit;
+      if (hit) matchesNonOther++;
+    });
+
+    // 2) טיפול ב"אחר":
+    // - אם המשתמש מחפש "אחר" מפורש => להציג
+    // - אם אין התאמות אחרות => להציג רק "אחר"
+    if (other) {
+      const otherHit = getOptionSearchText(other).includes(q);
+
+      if (otherHit) {
+        // מחפש "אחר" => מציגים אותו בנוסף (לא משנה אם יש התאמות אחרות)
+        other.hidden = false;
+      } else if (matchesNonOther === 0) {
+        // אין התאמות => רק "אחר"
+        opts.forEach((o) => (o.hidden = true));
+        other.hidden = false;
+      } else {
+        // יש התאמות אחרות ואין חיפוש "אחר" => "אחר" נשאר מוסתר
+        other.hidden = true;
+      }
+    }
+  };
 
   const scrollMenuFullyIntoView = (gap = 16) => {
     requestAnimationFrame(() => {
@@ -287,8 +379,25 @@ function initSelectBase(root) {
     const selectedIndex = opts.findIndex(
       (o) => o.getAttribute('aria-selected') === 'true',
     );
+
     activeIndex = selectedIndex >= 0 ? selectedIndex : 0;
     setActive(activeIndex);
+
+    if (searchEl) {
+      combobox.classList.add('is-searching');
+      searchEl.hidden = false;
+
+      const isMulti = !!root.querySelector('.form-input-select-multi-menu');
+      const prefill = isMulti ? '' : getSelectedLabel();
+      searchEl.value = prefill;
+      selectionChangedDuringOpen = false;
+
+      applyFilter(searchEl.value);
+
+      const visible = options().filter((o) => !o.hidden);
+      activeIndex = visible.length ? options().indexOf(visible[0]) : -1;
+      if (activeIndex >= 0) setActive(activeIndex);
+    }
   };
 
   const close = () => {
@@ -296,6 +405,21 @@ function initSelectBase(root) {
     listbox.hidden = true;
     clearActive();
     activeIndex = -1;
+
+    if (searchEl) {
+      combobox.classList.remove('is-searching');
+      searchEl.hidden = true;
+
+      if (selectionChangedDuringOpen) {
+        // היתה בחירה => נשאיר את הבחירה כשורת החיפוש
+        searchEl.value = getSelectedLabel();
+      } else {
+        // לא היתה בחירה => נקה
+        searchEl.value = '';
+      }
+
+      applyFilter(''); // להחזיר את הרשימה למצב מלא
+    }
   };
 
   const toggle = () => (isOpen() ? close() : open());
@@ -316,13 +440,72 @@ function initSelectBase(root) {
   const moveActive = (dir) => {
     if (!isOpen()) open();
     const opts = options();
-    const next = Math.max(0, Math.min(opts.length - 1, activeIndex + dir));
+    if (!opts.length) return;
+
+    let next = activeIndex;
+    for (let i = 0; i < opts.length; i++) {
+      next = Math.max(0, Math.min(opts.length - 1, next + dir));
+      if (!opts[next]?.hidden) break;
+    }
+
     activeIndex = next;
     setActive(activeIndex);
   };
 
-  // toggle פתיחה
-  combobox.addEventListener('click', toggle);
+  if (searchEl) {
+    searchEl.addEventListener('input', () => {
+      applyFilter(searchEl.value);
+
+      // כשמסננים, כדאי להגדיר activeIndex לאופציה הראשונה הנראית
+      const visible = options().filter((o) => !o.hidden);
+      activeIndex = visible.length ? options().indexOf(visible[0]) : -1;
+      if (activeIndex >= 0) setActive(activeIndex);
+    });
+
+    // Enter בחיפוש: לבחור את האופציה הפעילה (אם קיימת)
+    searchEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const active = listbox.querySelector('.is-active:not([hidden])');
+        if (active) active.click();
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        close();
+        combobox.focus();
+      }
+    });
+
+    // מונע מהקליק באינפוט "להפעיל" את הכפתור שמכיל אותו
+    searchEl.addEventListener('pointerdown', (e) => e.stopPropagation());
+    searchEl.addEventListener('click', (e) => e.stopPropagation());
+  }
+
+  if (searchEl) {
+    // פתיחה + פוקוס בשורת החיפוש באותה לחיצה
+    combobox.addEventListener('pointerdown', (e) => {
+      // אם לחצת בתוך שורת החיפוש - לא לעשות כלום
+      if (e.target.closest('[data-select-search]')) return;
+
+      // אם כבר פתוח - לא לפתוח שוב
+      if (isOpen()) return;
+
+      // מונע מהדפדפן לתת פוקוס לכפתור לפני שאנחנו מפקסים את ה-input
+      e.preventDefault();
+
+      open();
+      requestAnimationFrame(() => searchEl.focus());
+    });
+
+    // סגירה בקליק רגיל (אבל לא כשמקליקים בתוך החיפוש)
+    combobox.addEventListener('click', (e) => {
+      if (e.target.closest('[data-select-search]')) return;
+      if (isOpen()) close();
+    });
+  } else {
+    // בלי חיפוש: התנהגות רגילה (פתיחה/סגירה באותו כפתור)
+    combobox.addEventListener('click', toggle);
+  }
 
   // מקלדת בסיסית
   combobox.addEventListener('keydown', (e) => {
@@ -361,6 +544,10 @@ function initSelectBase(root) {
   const placeholder = combobox.dataset.placeholder || '‎';
   if (!hiddenInput.value) valueEl.textContent = placeholder;
 
+  const markSelectionChanged = () => {
+    selectionChangedDuringOpen = true;
+  };
+
   return {
     root,
     combobox,
@@ -373,6 +560,7 @@ function initSelectBase(root) {
     open,
     close,
     toggle,
+    markSelectionChanged,
   };
 }
 
@@ -434,7 +622,10 @@ function initSingleSelect(root) {
   // קליק על אופציות
   base.listbox.addEventListener('click', (e) => {
     const opt = e.target.closest('[role="option"]');
-    if (opt) setSelected(opt);
+    if (!opt) return;
+
+    base.markSelectionChanged();
+    setSelected(opt);
   });
 
   // Enter/Space בוחר אופציה פעילה
