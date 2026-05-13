@@ -503,8 +503,8 @@ function initSelectBase(root) {
       // iOS: חייבים למנוע ברירת מחדל כדי לא לתת לכפתור לגנוב פוקוס
       e.preventDefault();
 
-      // focus סינכרוני (לא rAF)
-      searchEl.focus({ preventScroll: true });
+      combobox.scrollIntoView({ block: 'center', inline: 'nearest' });
+      searchEl.focus();
     };
 
     // iOS: touchstart הוא הכי אמין לפוקוס
