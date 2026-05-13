@@ -52,7 +52,6 @@ export const treeTypes = [
   { value: 'סיזיגיום', label: 'סיזיגיום' },
   { value: 'סיסם', label: 'סיסם' },
   { value: 'ספיון', label: 'ספיון' },
-  { value: 'עץ', label: 'עץ' },
   { value: 'פודוקרפוס', label: 'פודוקרפוס' },
   { value: 'פיטולקה', label: 'פיטולקה' },
   { value: 'פיקוס', label: 'פיקוס' },
