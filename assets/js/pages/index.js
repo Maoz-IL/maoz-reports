@@ -482,28 +482,55 @@ function initSelectBase(root) {
   }
 
   if (searchEl) {
-    // פתיחה + פוקוס בשורת החיפוש באותה לחיצה
-    combobox.addEventListener('pointerdown', (e) => {
-      // אם לחצת בתוך שורת החיפוש - לא לעשות כלום
+    let suppressNextClick = false;
+
+    const openAndFocusSearch = (e) => {
+      // אם לחצו על ה-input עצמו
       if (e.target.closest('[data-select-search]')) return;
 
-      // אם כבר פתוח - לא לפתוח שוב
-      if (isOpen()) return;
+      // אם כבר פתוח - רק לפקס
+      if (!isOpen()) {
+        open();
+      }
 
-      // מונע מהדפדפן לתת פוקוס לכפתור לפני שאנחנו מפקסים את ה-input
+      // חשוב לאייפון: focus חייב להיות בתוך האירוע עצמו
+      searchEl.hidden = false; // ביטחון (ב-open כבר עושה)
+      combobox.classList.add('is-searching');
+
+      // מונע “קליק” שיבוא אחרי touchstart מלסגור מיד
+      suppressNextClick = true;
+
+      // iOS: חייבים למנוע ברירת מחדל כדי לא לתת לכפתור לגנוב פוקוס
       e.preventDefault();
 
-      open();
-      requestAnimationFrame(() => searchEl.focus());
-    });
+      // focus סינכרוני (לא rAF)
+      searchEl.focus({ preventScroll: true });
+    };
 
-    // סגירה בקליק רגיל (אבל לא כשמקליקים בתוך החיפוש)
+    // iOS: touchstart הוא הכי אמין לפוקוס
+    combobox.addEventListener('touchstart', openAndFocusSearch, { passive: false });
+
+    // Desktop/Android/Pointer devices
+    combobox.addEventListener('pointerdown', openAndFocusSearch);
+
+    // קליק משמש רק לסגירה (ולא אחרי ה-touchstart)
     combobox.addEventListener('click', (e) => {
       if (e.target.closest('[data-select-search]')) return;
+
+      if (suppressNextClick) {
+        suppressNextClick = false;
+        return;
+      }
+
       if (isOpen()) close();
+      else open();
     });
+
+    // מונע מהקליק בתוך האינפוט להפעיל את הכפתור
+    searchEl.addEventListener('pointerdown', (e) => e.stopPropagation());
+    searchEl.addEventListener('click', (e) => e.stopPropagation());
   } else {
-    // בלי חיפוש: התנהגות רגילה (פתיחה/סגירה באותו כפתור)
+    // בלי חיפוש: התנהגות רגילה
     combobox.addEventListener('click', toggle);
   }
 
