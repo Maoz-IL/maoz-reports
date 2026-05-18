@@ -1,0 +1,44 @@
+.submit-indicator[hidden] {
+  display: none;
+}
+
+.submit-indicator {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+
+  display: grid;
+  place-items: center;
+
+  background-color: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(0.2rem);
+}
+
+.submit-indicator__panel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  font-weight: 700;
+  color: var(--color-primary-1, #111);
+  padding: 1rem 1.25rem;
+  background-color: var(--color-light-1);
+  border-radius: var(--border-radius-m);
+  box-shadow: 0 1rem 2rem var(--color-shadow-1);
+}
+
+.submit-indicator__animation {
+  width: 1.25rem;
+  aspect-ratio: 1/1;
+
+  border-radius: 50%;
+  border: 3px solid var(--color-light-3);
+  border-top-color: var(--color-primary-2);
+  animation: submitSpin 1000ms linear infinite;
+}
+
+@keyframes submitSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
