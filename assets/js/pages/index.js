@@ -25,11 +25,30 @@ const footerStageIndicator = [...document.querySelectorAll('.footer-stage-indica
 const btnPrev = document.querySelector('.footer-button-prev');
 const btnNext = document.querySelector('.footer-button-next');
 
+const submitIndicator = document.querySelector('#submitIndicator');
+
 const scrollToTop = () => {
   window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
 };
 
 let currentStep = formSteps.findIndex((step) => step.classList.contains('current-step'));
+
+// ================================
+// Submit Indicator Show/Hide
+// ================================
+
+function showSubmitIndicator() {
+  if (!submitIndicator) return;
+  submitIndicator.hidden = false;
+  document.body.style.pointerEvents = 'none';
+  submitIndicator.style.pointerEvents = 'auto';
+}
+
+function hideSubmitIndicator() {
+  if (!submitIndicator) return;
+  submitIndicator.hidden = true;
+  document.body.style.pointerEvents = '';
+}
 
 // ================================
 // Step validation + Next button UI
@@ -1614,6 +1633,10 @@ function buildFireberryPayload({ baseFd, workTypeGroupFd, photos = [] }) {
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  showSubmitIndicator();
+  const prevNextDisabled = btnNext?.disabled;
+  if (btnNext) btnNext.disabled = true;
+
   try {
     // 1) איסוף כל בלוקי "סוג עבודה"
     const workTypeGroups = Array.from(
@@ -1621,7 +1644,8 @@ form.addEventListener('submit', async (e) => {
     );
 
     if (workTypeGroups.length === 0) {
-      console.warn('No work-type groups found.');
+      hideSubmitIndicator();
+      if (btnNext) btnNext.disabled = prevNextDisabled ?? false;
       return;
     }
 
@@ -1641,7 +1665,7 @@ form.addEventListener('submit', async (e) => {
       return buildFireberryPayload({
         baseFd,
         workTypeGroupFd: groupFd,
-        photos, // אם השארת בפנים שימוש ל-metadata — תסיר שם, ראה הערה למטה
+        photos,
       });
     });
 
@@ -1661,16 +1685,20 @@ form.addEventListener('submit', async (e) => {
     const out = await res.json().catch(() => null);
     console.log('Netlify function response:', out);
 
-    if (!res.ok || !out) {
-      console.error('Function returned non-OK response:', res.status);
+    // ✅ אם צריך redirect — עושים אותו ויוצאים. לא מסתירים Indicator.
+    if (!APP_FLAGS.dryRun && out?.ok && APP_FLAGS.redirectOnSubmit) {
+      window.location.href = ROUTES.success;
       return;
     }
 
-    // redirect רק במצב live ורק אם ok
-    if (!APP_FLAGS.dryRun && out.ok && APP_FLAGS.redirectOnSubmit) {
-      window.location.href = ROUTES.success;
-    }
+    // ✅ אם לא עושים redirect — מחזירים UI למצב רגיל
+    hideSubmitIndicator();
+    if (btnNext) btnNext.disabled = prevNextDisabled ?? false;
   } catch (err) {
     console.error('Submit failed:', err);
+
+    // ✅ בכשל — מחזירים UI
+    hideSubmitIndicator();
+    if (btnNext) btnNext.disabled = prevNextDisabled ?? false;
   }
 });
