@@ -1,5 +1,6 @@
-# Node Modules
+# Node Modules/Deno
 node_modules/
+deno.lock
 
 # Environment Variables
 .env

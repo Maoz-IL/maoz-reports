@@ -10,24 +10,52 @@
   display: grid;
   place-items: center;
 
-  background-color: rgba(0, 0, 0, 0.55);
+  background-color: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(0.2rem);
 }
 
 .submit-indicator__panel {
+  font-weight: 700;
+  color: var(--color-primary-1);
+}
+
+.submit-indicator__state {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 
-  font-weight: 700;
-  color: var(--color-primary-1, #111);
   padding: 1rem 1.25rem;
   background-color: var(--color-light-1);
   border-radius: var(--border-radius-m);
+
   box-shadow: 0 1rem 2rem var(--color-shadow-1);
 }
 
-.submit-indicator__animation {
+.submit-indicator__state--loading {
+  background-color: var(--color-light-1);
+}
+
+.submit-indicator__state--error {
+  max-width: 50%;
+  margin: 0 auto;
+
+  color: var(--color-light-3);
+  padding: 1.75rem 1.5rem;
+  background-color: var(--color-error-2);
+}
+
+.submit-indicator__icon {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 1.25rem;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.submit-indicator__animation--loading {
   width: 1.25rem;
   aspect-ratio: 1/1;
 
@@ -35,6 +63,47 @@
   border: 3px solid var(--color-light-3);
   border-top-color: var(--color-primary-2);
   animation: submitSpin 1000ms linear infinite;
+}
+
+.submit-indicator__error-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  text-align: center;
+  line-height: 1.4;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.submit-indicator__error-title {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.submit-indicator__error-detail {
+  opacity: 0.8;
+  line-height: 1.35;
+  word-break: break-word;
+
+  font-weight: 800;
+}
+
+.submit-indicator__actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+
+  margin-top: 0.75rem;
+}
+
+.submit-indicator__state--error .btn-primary {
+  background-color: var(--color-primary-4);
+}
+
+.submit-indicator__state--error .btn-secondary {
+  color: var(--color-light-1);
+  border-color: var(--color-light-3);
 }
 
 @keyframes submitSpin {

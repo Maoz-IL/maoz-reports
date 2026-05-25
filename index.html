@@ -1479,8 +1479,44 @@
       hidden
     >
       <div class="submit-indicator__panel" role="status">
-        <span class="submit-indicator__animation" aria-hidden="true"></span>
-        <span class="submit-indicator__text">שולח טופס...</span>
+        <!-- מצב טעינה -->
+        <div
+          class="submit-indicator__state submit-indicator__state--loading"
+          data-submit-state="loading"
+        >
+          <span class="submit-indicator__animation--loading" aria-hidden="true"></span>
+          <span class="submit-indicator__text--loading">שולח טופס...</span>
+        </div>
+
+        <!-- מצב שגיאה -->
+        <div
+          class="submit-indicator__state submit-indicator__state--error"
+          data-submit-state="error"
+          hidden
+        >
+          <!-- <span class="submit-indicator__icon" aria-hidden="true"></span> -->
+
+          <div class="submit-indicator__error-content">
+            <div class="submit-indicator__error-title">שגיאה</div>
+            <div>
+              <div>
+                אירעה שגיאה מסוג
+                <div class="submit-indicator__error-detail" id="submitErrorDetail"></div>
+              </div>
+              <br />
+              ניתן לנסות שוב או לדווח על השגיאה למפתח המוצר.
+            </div>
+
+            <div class="submit-indicator__actions">
+              <button type="button" class="btn btn-primary" id="btnSubmitRetry">
+                נסה שוב
+              </button>
+              <button type="button" class="btn btn-secondary" id="btnSubmitClose">
+                סגור
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </body>

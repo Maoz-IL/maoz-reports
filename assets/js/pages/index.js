@@ -26,6 +26,13 @@ const btnPrev = document.querySelector('.footer-button-prev');
 const btnNext = document.querySelector('.footer-button-next');
 
 const submitIndicator = document.querySelector('#submitIndicator');
+const submitStateLoading = submitIndicator?.querySelector(
+  '[data-submit-state="loading"]',
+);
+const submitStateError = submitIndicator?.querySelector('[data-submit-state="error"]');
+const submitErrorDetail = document.querySelector('#submitErrorDetail');
+const btnSubmitClose = document.querySelector('#btnSubmitClose');
+const btnSubmitRetry = document.querySelector('#btnSubmitRetry');
 
 const scrollToTop = () => {
   window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
@@ -33,15 +40,32 @@ const scrollToTop = () => {
 
 let currentStep = formSteps.findIndex((step) => step.classList.contains('current-step'));
 
-// ================================
-// Submit Indicator Show/Hide
-// ================================
+// =================================
+// Submit Indicator State Management
+// =================================
 
-function showSubmitIndicator() {
+function showSubmitLoading() {
   if (!submitIndicator) return;
+
   submitIndicator.hidden = false;
   document.body.style.pointerEvents = 'none';
   submitIndicator.style.pointerEvents = 'auto';
+
+  if (submitStateError) submitStateError.hidden = true;
+  if (submitStateLoading) submitStateLoading.hidden = false;
+}
+
+function showSubmitError(message) {
+  if (!submitIndicator) return;
+
+  submitIndicator.hidden = false;
+  document.body.style.pointerEvents = 'none';
+  submitIndicator.style.pointerEvents = 'auto';
+
+  if (submitStateLoading) submitStateLoading.hidden = true;
+  if (submitStateError) submitStateError.hidden = false;
+
+  if (submitErrorDetail) submitErrorDetail.textContent = message || 'שגיאה לא ידועה';
 }
 
 function hideSubmitIndicator() {
@@ -1630,75 +1654,120 @@ function buildFireberryPayload({ baseFd, workTypeGroupFd, photos = [] }) {
 
 // ===============================================
 
+let retryLastSubmit = null;
+
+if (btnSubmitClose) {
+  btnSubmitClose.addEventListener('click', () => {
+    hideSubmitIndicator();
+  });
+}
+
+if (btnSubmitRetry) {
+  btnSubmitRetry.addEventListener('click', () => {
+    if (typeof retryLastSubmit === 'function') {
+      showSubmitLoading();
+      retryLastSubmit();
+    }
+  });
+}
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  showSubmitIndicator();
-  const prevNextDisabled = btnNext?.disabled;
-  if (btnNext) btnNext.disabled = true;
+  const runSubmit = async () => {
+    const prevNextDisabled = btnNext?.disabled;
+    if (btnNext) btnNext.disabled = true;
 
-  try {
-    // 1) איסוף כל בלוקי "סוג עבודה"
-    const workTypeGroups = Array.from(
-      document.querySelectorAll('.form-fields-group-work-type'),
-    );
+    try {
+      // 1) איסוף כל בלוקי "סוג עבודה"
+      const workTypeGroups = Array.from(
+        document.querySelectorAll('.form-fields-group-work-type'),
+      );
 
-    if (workTypeGroups.length === 0) {
+      if (workTypeGroups.length === 0) {
+        hideSubmitIndicator();
+        if (btnNext) btnNext.disabled = prevNextDisabled ?? false;
+        return;
+      }
+
+      // 2) Base FD: כל הטופס חוץ מבלוקי סוג עבודה
+      const baseFd = buildBaseFormData(form, workTypeGroups);
+
+      // 3) תמונות (פעם אחת בלבד)
+      const photos = photosApi?.getFiles?.() ?? [];
+
+      // 4) Build payloads (אחד לכל בלוק סוג עבודה)
+      const payloads = workTypeGroups.map((group) => {
+        const groupFd = new FormData();
+        group.querySelectorAll('input, select, textarea').forEach((el) => {
+          appendControlToFormData(groupFd, el);
+        });
+
+        return buildFireberryPayload({
+          baseFd,
+          workTypeGroupFd: groupFd,
+          photos,
+        });
+      });
+
+      // 5) multipart submit: payloads + photos
+      const submitFd = new FormData();
+      submitFd.append('dryRun', String(APP_FLAGS.dryRun));
+      submitFd.append('payloads', JSON.stringify(payloads));
+
+      photos.forEach((file) => submitFd.append('photos', file, file.name));
+
+      // ⚠️ לא להוסיף Content-Type ידנית — הדפדפן מוסיף boundary
+      const res = await fetch(API_URL, { method: 'POST', body: submitFd });
+      const out = await res.json().catch(() => null);
+
+      // אם השרת/פונקציה החזירו HTTP שגיאה:
+      if (!res.ok) {
+        showSubmitError(out?.error || out?.message || `HTTP ${res.status}`);
+        if (btnNext) btnNext.disabled = prevNextDisabled ?? false;
+        return;
+      }
+
+      // אם הפונקציה החזירה ok:false (create/upload נכשל)
+      if (out?.ok === false) {
+        // נסיון למצוא סיבה טובה מתוך results/uploads
+        const firstCreateFail = out?.results?.find?.((r) => r?.ok === false);
+        const firstUploadFail = out?.uploads?.find?.((u) => u?.ok === false);
+
+        const detail =
+          out?.error ||
+          firstUploadFail?.response?.Message ||
+          firstUploadFail?.response?.message ||
+          firstUploadFail?.response?.raw ||
+          firstCreateFail?.response?.Message ||
+          firstCreateFail?.response?.message ||
+          firstCreateFail?.response?.raw ||
+          'השליחה נכשלה. נסו שוב.';
+
+        showSubmitError(detail);
+        if (btnNext) btnNext.disabled = prevNextDisabled ?? false;
+        return;
+      }
+
+      // הצלחה: redirect אם צריך
+      if (!APP_FLAGS.dryRun && out?.ok && APP_FLAGS.redirectOnSubmit) {
+        window.location.href = ROUTES.success;
+        return;
+      }
+
+      // הצלחה בלי redirect (dryRun וכו')
       hideSubmitIndicator();
       if (btnNext) btnNext.disabled = prevNextDisabled ?? false;
-      return;
+    } catch (err) {
+      showSubmitError(err?.message || 'תקלה ברשת/שרת. נסו שוב.');
+      if (btnNext) btnNext.disabled = prevNextDisabled ?? false;
     }
+  };
 
-    // 2) Base FD: כל הטופס חוץ מבלוקי סוג עבודה
-    const baseFd = buildBaseFormData(form, workTypeGroups);
+  // לשמור ל-Retry
+  retryLastSubmit = runSubmit;
 
-    // 3) תמונות (פעם אחת בלבד)
-    const photos = photosApi?.getFiles?.() ?? [];
-
-    // 4) Build payloads (אחד לכל בלוק סוג עבודה)
-    const payloads = workTypeGroups.map((group) => {
-      const groupFd = new FormData();
-      group.querySelectorAll('input, select, textarea').forEach((el) => {
-        appendControlToFormData(groupFd, el);
-      });
-
-      return buildFireberryPayload({
-        baseFd,
-        workTypeGroupFd: groupFd,
-        photos,
-      });
-    });
-
-    // 5) multipart submit: payloads + photos
-    const submitFd = new FormData();
-    submitFd.append('dryRun', String(APP_FLAGS.dryRun));
-    submitFd.append('payloads', JSON.stringify(payloads));
-
-    photos.forEach((file) => submitFd.append('photos', file, file.name));
-
-    // ⚠️ לא להוסיף Content-Type ידנית — הדפדפן מוסיף boundary
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      body: submitFd,
-    });
-
-    const out = await res.json().catch(() => null);
-    console.log('Netlify function response:', out);
-
-    // ✅ אם צריך redirect — עושים אותו ויוצאים. לא מסתירים Indicator.
-    if (!APP_FLAGS.dryRun && out?.ok && APP_FLAGS.redirectOnSubmit) {
-      window.location.href = ROUTES.success;
-      return;
-    }
-
-    // ✅ אם לא עושים redirect — מחזירים UI למצב רגיל
-    hideSubmitIndicator();
-    if (btnNext) btnNext.disabled = prevNextDisabled ?? false;
-  } catch (err) {
-    console.error('Submit failed:', err);
-
-    // ✅ בכשל — מחזירים UI
-    hideSubmitIndicator();
-    if (btnNext) btnNext.disabled = prevNextDisabled ?? false;
-  }
+  // להתחיל שליחה
+  showSubmitLoading();
+  runSubmit();
 });
