@@ -63,13 +63,6 @@ export const workers = [
     alt: 'תמונת הפרופיל של העובד',
   },
   {
-    value: 'יצחק קרילקר',
-    label: 'יצחק קרילקר',
-    role: 'קבלן',
-    img: '/assets/images/profile-blank-xs.avif',
-    alt: 'תמונת הפרופיל של העובד',
-  },
-  {
     value: 'מוראד',
     label: 'מוראד',
     role: 'קבלן',
@@ -112,13 +105,6 @@ export const workers = [
     alt: 'תמונת הפרופיל של העובד',
   },
   {
-    value: 'מחמוד קטאווי',
-    label: 'מחמוד קטאווי',
-    role: 'עובד',
-    img: '/assets/images/profile-blank-xs.avif',
-    alt: 'תמונת הפרופיל של העובד',
-  },
-  {
     value: 'ספוות שיכה',
     label: 'ספוות שיכה',
     role: 'עובד',
@@ -128,6 +114,13 @@ export const workers = [
   {
     value: 'רפעת אבו יאסין',
     label: 'רפעת אבו יאסין',
+    role: 'עובד',
+    img: '/assets/images/profile-blank-xs.avif',
+    alt: 'תמונת הפרופיל של העובד',
+  },
+  {
+    value: 'אחר',
+    label: 'אחר',
     role: 'עובד',
     img: '/assets/images/profile-blank-xs.avif',
     alt: 'תמונת הפרופיל של העובד',
