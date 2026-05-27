@@ -28,7 +28,7 @@ export const FB_FIELDS = {
   treesCount: 'pcfsystemfield1021',
   treeHeight: 'pcfsystemfield1041',
   treeBindType: 'pcfsystemfield1035',
-  treeBindLength: 'pcfsystemfield1036',
+  treeBindLength: 'pcfsystemfield1043',
   workHourDescription: 'pcfsystemfield1019',
   transportsCount: 'pcfsystemfield1024',
   treeStumpForCharge: 'pcfsystemfield1028',

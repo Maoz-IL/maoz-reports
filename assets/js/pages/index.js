@@ -1584,7 +1584,7 @@ function formDataToObject(fd) {
   return obj;
 }
 
-function buildFireberryPayload({ baseFd, workTypeGroupFd, photos = [] }) {
+function buildFireberryPayload({ baseFd, workTypeGroupFd = [] }) {
   // baseFd = כל השדות הכלליים (ללא workType group)
   // workTypeGroupFd = השדות של בלוק סוג עבודה אחד בלבד
   const baseObj = formDataToObject(baseFd);
@@ -1596,31 +1596,10 @@ function buildFireberryPayload({ baseFd, workTypeGroupFd, photos = [] }) {
   // ממפים ל-fieldName של Fireberry
   const fields = {};
 
-  // שליחת ערכים מספריים כטקסט בצירוף יחיד/רבים
-  const formatCountWithUnit = (rawValue, singular, plural) => {
-    const raw = String(rawValue ?? '').trim();
-    if (raw === '') return null;
-
-    const n = Number(raw);
-    if (!Number.isNaN(n)) {
-      const unit = n === 1 ? singular : plural;
-      return `${n} ${unit}`;
-    }
-
-    // fallback אם זה לא מספר (נדיר בשדה number)
-    return `${raw} ${plural}`;
-  };
-
   for (const [formKey, formValue] of Object.entries(merged)) {
     const fbFieldName = FB_FIELDS[formKey];
 
     if (!fbFieldName) continue; // אם אין mapping – מדלגים
-
-    if (formKey === 'treeBindLength') {
-      const formatted = formatCountWithUnit(formValue, 'מטר', 'מטרים');
-      if (formatted !== null) fields[fbFieldName] = formatted;
-      continue;
-    }
 
     // נרמול בסיסי:
     // מספרים שהגיעו כמחרוזת -> מספר
@@ -1629,6 +1608,14 @@ function buildFireberryPayload({ baseFd, workTypeGroupFd, photos = [] }) {
       if (raw === '') continue;
       const n = Number(raw);
       if (!Number.isNaN(n)) fields[fbFieldName] = n;
+      continue;
+    }
+
+    if (formKey === 'treeBindLength') {
+      const raw = String(formValue ?? '').trim();
+      if (raw === '') continue; // ריק => לא שולחים בכלל
+      const n = Number(raw);
+      if (!Number.isNaN(n)) fields[fbFieldName] = n; // ✅ מספר אמיתי
       continue;
     }
 
