@@ -1622,20 +1622,21 @@ function buildFireberryPayload({ baseFd, workTypeGroupFd, photos = [] }) {
       continue;
     }
 
-    if (formKey === 'transportsCount') {
-      const formatted = formatCountWithUnit(formValue, 'הובלה', 'הובלות');
-      if (formatted !== null) fields[fbFieldName] = formatted;
-      continue;
-    }
-
     // נרמול בסיסי:
     // מספרים שהגיעו כמחרוזת -> מספר
-    // (אפשר להרחיב לפי הצורך)
     if (formKey === 'treesCount') {
       const raw = String(formValue ?? '').trim();
       if (raw === '') continue;
       const n = Number(raw);
       if (!Number.isNaN(n)) fields[fbFieldName] = n;
+      continue;
+    }
+
+    if (formKey === 'transportsCount') {
+      const raw = String(formValue ?? '').trim();
+      if (raw === '') continue; // אם ריק – לא שולחים
+      const n = Number(raw);
+      if (!Number.isNaN(n)) fields[fbFieldName] = n; // ✅ מספר אמיתי
       continue;
     }
 
