@@ -9,6 +9,7 @@ import { workTypes } from '../data/workTypes.js';
 import { workHourTypes } from '../data/workHourTypes.js';
 import { treeTypes } from '../data/treeTypes.js';
 import { treeBindTypes } from '../data/treeBindTypes.js';
+import { compressPhotosSequential, COMPRESSION_CFG, bytesToMB } from '../compression.js';
 import { API_URL, FB_OBJECT, FB_FIELDS } from '../fireberry.schema.js';
 import { APP_FLAGS, ROUTES } from '../router.js';
 
@@ -26,6 +27,7 @@ const btnPrev = document.querySelector('.footer-button-prev');
 const btnNext = document.querySelector('.footer-button-next');
 
 const submitIndicator = document.querySelector('#submitIndicator');
+const submitIndicatorText = document.querySelector('#submitIndicatorText');
 const submitStateLoading = submitIndicator?.querySelector(
   '[data-submit-state="loading"]',
 );
@@ -1659,11 +1661,14 @@ if (btnSubmitRetry) {
   });
 }
 
+const nextPaint = () => new Promise((resolve) => requestAnimationFrame(() => resolve()));
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const runSubmit = async () => {
     const prevNextDisabled = btnNext?.disabled;
+
     if (btnNext) btnNext.disabled = true;
 
     try {
@@ -1681,10 +1686,7 @@ form.addEventListener('submit', async (e) => {
       // 2) Base FD: כל הטופס חוץ מבלוקי סוג עבודה
       const baseFd = buildBaseFormData(form, workTypeGroups);
 
-      // 3) תמונות (פעם אחת בלבד)
-      const photos = photosApi?.getFiles?.() ?? [];
-
-      // 4) Build payloads (אחד לכל בלוק סוג עבודה)
+      // 2.5) Build payloads (אחד לכל בלוק סוג עבודה)
       const payloads = workTypeGroups.map((group) => {
         const groupFd = new FormData();
         group.querySelectorAll('input, select, textarea').forEach((el) => {
@@ -1694,15 +1696,42 @@ form.addEventListener('submit', async (e) => {
         return buildFireberryPayload({
           baseFd,
           workTypeGroupFd: groupFd,
-          photos,
         });
       });
 
-      // 5) multipart submit: payloads + photos
+      // 2.6) multipart submit: payloads + photos
       const submitFd = new FormData();
       submitFd.append('dryRun', String(APP_FLAGS.dryRun));
       submitFd.append('payloads', JSON.stringify(payloads));
 
+      const originalPhotos = photosApi?.getFiles?.() ?? [];
+
+      if (submitIndicatorText) submitIndicatorText.textContent = 'דוחס תמונות...';
+      await nextPaint(); // ✅ נותן למסך להתעדכן לפני הדחיסה הכבדה
+
+      const photos = await compressPhotosSequential(
+        originalPhotos,
+        (done, total) => {
+          if (submitIndicatorText) {
+            submitIndicatorText.textContent = `דוחס תמונות... (${done}/${total})`;
+          }
+        },
+        COMPRESSION_CFG,
+      );
+
+      const totalBytes = photos.reduce((sum, f) => sum + (f?.size || 0), 0);
+
+      if (totalBytes > COMPRESSION_CFG.maxTotalBytes) {
+        showSubmitError(
+          `התמונות גדולות מדי לשליחה (${bytesToMB(totalBytes)}MB). נסה לבחור פחות תמונות או תמונות קטנות יותר.`,
+        );
+        if (btnNext) btnNext.disabled = prevNextDisabled ?? false;
+        return;
+      }
+
+      if (submitIndicatorText) submitIndicatorText.textContent = 'שולח טופס...';
+
+      // הוספה ל-FormData: הקבצים הדחוסים בלבד
       photos.forEach((file) => submitFd.append('photos', file, file.name));
 
       // ⚠️ לא להוסיף Content-Type ידנית — הדפדפן מוסיף boundary
