@@ -20,6 +20,16 @@ export const vehicles = [
     type: 'טרקטור',
   },
   {
+    value: 'טרקטור נורקר',
+    label: 'טרקטור נורקר',
+    type: 'טרקטור',
+  },
+  {
+    value: 'משאית מנוף סל',
+    label: 'משאית מנוף סל',
+    type: 'משאית',
+  },
+  {
     value: 'משאית פינוי גזם (Iveco)',
     label: 'משאית פינוי גזם (Iveco)',
     type: 'משאית',
