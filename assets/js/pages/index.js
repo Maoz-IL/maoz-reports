@@ -938,17 +938,14 @@ const treeBindTypeSelectMenus = document.querySelectorAll(
 );
 
 const teamLeadRoles = new Set(['מנהל פרויקט', 'ראש צוות', 'קבלן']);
-const teamMemberRoles = new Set(['עובד']);
-
 const teamLeadsFilter = workers.filter((w) => teamLeadRoles.has(w.role));
-const teamMembersFilter = workers.filter((w) => teamMemberRoles.has(w.role));
 
 renderSelectOptions(teamLeadSelectMenu, teamLeadsFilter, {
   metaKey: 'role',
   showImage: true,
 });
 
-renderSelectOptions(teamMembersSelectMenu, teamMembersFilter, {
+renderSelectOptions(teamMembersSelectMenu, workers, {
   metaKey: 'role',
   showImage: true,
 });
