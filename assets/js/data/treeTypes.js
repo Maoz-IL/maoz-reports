@@ -1,4 +1,5 @@
 export const treeTypes = [
+  { value: 'אבוקדו', label: 'אבוקדו' },
   { value: 'אולמוס', label: 'אולמוס' },
   { value: 'אורן', label: 'אורן' },
   { value: 'אזדרכת', label: 'אזדרכת' },
@@ -63,6 +64,7 @@ export const treeTypes = [
   { value: 'צאלון', label: 'צאלון' },
   { value: 'צחר כחלחל', label: 'צחר כחלחל' },
   { value: 'צפצפה', label: 'צפצפה' },
+  { value: 'קופניון', label: 'קופניון' },
   { value: 'קזוארינה', label: 'קזוארינה' },
   { value: 'קיגיליה', label: 'קיגיליה' },
   { value: 'קינמון', label: 'קינמון' },
