@@ -178,6 +178,117 @@ function focusFirstInvalidInCurrentStep() {
   if (combo) combo.focus();
 }
 
+// ==========================
+// Skip Step 3 when needed
+// ==========================
+
+const stepsEl = document.querySelector('.steps'); // בשביל data-step (אופציונלי)
+
+const STEP_2_INDEX = 1;
+const STEP_3_INDEX = 2;
+const STEP_4_INDEX = 3;
+
+const workTypeFieldset = formSteps[STEP_3_INDEX];
+
+let skipWorkTypeStep = false;
+
+function setSkipWorkTypeStep(shouldSkip) {
+  skipWorkTypeStep = shouldSkip;
+
+  if (!workTypeFieldset) return;
+
+  workTypeFieldset.hidden = shouldSkip;
+
+  // ✅ מנטרל ולידציה (required) בשלב 3 כשהוא מדולג
+  const controls = workTypeFieldset.querySelectorAll('input, select, textarea, button');
+
+  controls.forEach((el) => {
+    // שומרים מצב קודם כדי להחזיר בלי לשבור דברים
+    if (shouldSkip) {
+      if (!el.hasAttribute('data-was-disabled')) {
+        el.setAttribute('data-was-disabled', el.disabled ? '1' : '0');
+      }
+      el.disabled = true;
+    } else {
+      const wasDisabled = el.getAttribute('data-was-disabled');
+      if (wasDisabled !== null) {
+        el.disabled = wasDisabled === '1';
+        el.removeAttribute('data-was-disabled');
+      } else {
+        // אם משום מה לא נשמר ערך, לא נוגעים
+      }
+    }
+  });
+}
+
+function getNextStepIndex(fromIndex) {
+  // דילוג מ-2 -> 4
+  if (skipWorkTypeStep && fromIndex === STEP_2_INDEX) return STEP_4_INDEX;
+  return Math.min(fromIndex + 1, lastStepIndex);
+}
+
+function getPrevStepIndex(fromIndex) {
+  // חזרה מ-4 -> 2
+  if (skipWorkTypeStep && fromIndex === STEP_4_INDEX) return STEP_2_INDEX;
+  return Math.max(fromIndex - 1, 0);
+}
+
+function goToStep(targetIndex) {
+  if (targetIndex === currentStep) return;
+
+  // הסר מצב נוכחי
+  formSteps[currentStep].classList.remove('current-step');
+  footerStageIndicator[currentStep].classList.remove('current-step');
+
+  // עדכן current
+  currentStep = targetIndex;
+
+  // הוסף מצב נוכחי
+  formSteps[currentStep].classList.add('current-step');
+  footerStageIndicator[currentStep].classList.add('current-step');
+
+  // עדכן אינדיקטור עליון (הגלילה האנכית של המספרים)
+  titleStageIndicator.style.transform = `translateY(-${
+    titleStageIndicatorItem.getBoundingClientRect().height * currentStep
+  }px)`;
+
+  // עדכון רוחב הכפתור "הבא"
+  if (currentStep === 0) btnNext.style.width = '';
+  else btnNext.style.width = 'calc(85% - 0.5rem)';
+
+  // אופציונלי: אם אתה משתמש ב-data-step ב-CSS/JS
+  if (stepsEl) stepsEl.dataset.step = String(currentStep + 1);
+
+  updateNextButtonUI();
+  scrollToTop();
+}
+
+// מאזין לשינוי סטטוס משימה ומפעיל/מכבה דילוג
+function initSkipOnTaskStatus() {
+  const taskStatusHidden = document.querySelector('input[name="taskStatus"]');
+  if (!taskStatusHidden) return;
+
+  const apply = () => {
+    const shouldSkip = taskStatusHidden.value === 'לא טופלה';
+    setSkipWorkTypeStep(shouldSkip);
+
+    // ✅ לא קופצים אוטומטית משלב 2 לשלב 4.
+    // המשתמש יגיע לשלב 4 רק בלחיצה על "המשך" (דרך getNextStepIndex).
+
+    // אם נמצאים בשלב 3 והפעלנו דילוג — חייבים לצאת ממנו כי הוא מוסתר
+    if (shouldSkip && currentStep === STEP_3_INDEX) {
+      goToStep(STEP_4_INDEX);
+    }
+
+    updateNextButtonUI();
+  };
+
+  taskStatusHidden.addEventListener('change', apply);
+  apply(); // מצב התחלתי (אם נטען עם ערך)
+}
+
+initSkipOnTaskStatus();
+
 // ===============
 // Step Navigation
 // ===============
@@ -213,7 +324,7 @@ btnNext.addEventListener('click', (e) => {
     formSteps[currentStep].classList.remove('current-step');
     footerStageIndicator[currentStep].classList.remove('current-step');
 
-    currentStep += 1;
+    currentStep = getNextStepIndex(currentStep);
 
     formSteps[currentStep].classList.add('current-step');
     footerStageIndicator[currentStep].classList.add('current-step');
@@ -226,7 +337,6 @@ btnNext.addEventListener('click', (e) => {
       btnNext.style.width = 'calc(85% - 0.5rem)';
     }
 
-    // חשוב
     updateNextButtonUI();
   }
 });
@@ -240,7 +350,7 @@ btnPrev.addEventListener('click', () => {
     footerStageIndicator[currentStep].classList.remove('current-step');
 
     // חזור שלב אחד אחורה
-    currentStep -= 1;
+    currentStep = getPrevStepIndex(currentStep);
 
     // הוסף מצב נוכחי לשלב החדש
     formSteps[currentStep].classList.add('current-step');
@@ -1583,7 +1693,7 @@ function formDataToObject(fd) {
   return obj;
 }
 
-function buildFireberryPayload({ baseFd, workTypeGroupFd = [] }) {
+function buildFireberryPayload({ baseFd, workTypeGroupFd = new FormData() }) {
   // baseFd = כל השדות הכלליים (ללא workType group)
   // workTypeGroupFd = השדות של בלוק סוג עבודה אחד בלבד
   const baseObj = formDataToObject(baseFd);
@@ -1674,8 +1784,9 @@ form.addEventListener('submit', async (e) => {
         document.querySelectorAll('.form-fields-group-work-type'),
       );
 
-      if (workTypeGroups.length === 0) {
+      if (!skipWorkTypeStep && workTypeGroups.length === 0) {
         hideSubmitIndicator();
+
         if (btnNext) btnNext.disabled = prevNextDisabled ?? false;
         return;
       }
@@ -1683,18 +1794,31 @@ form.addEventListener('submit', async (e) => {
       // 2) Base FD: כל הטופס חוץ מבלוקי סוג עבודה
       const baseFd = buildBaseFormData(form, workTypeGroups);
 
-      // 2.5) Build payloads (אחד לכל בלוק סוג עבודה)
-      const payloads = workTypeGroups.map((group) => {
-        const groupFd = new FormData();
-        group.querySelectorAll('input, select, textarea').forEach((el) => {
-          appendControlToFormData(groupFd, el);
-        });
+      // 2.5) Build payloads
+      let payloads;
 
-        return buildFireberryPayload({
-          baseFd,
-          workTypeGroupFd: groupFd,
+      if (skipWorkTypeStep) {
+        // ✅ מדלגים על שלב 3 => שולחים רשומה אחת בלבד בלי שום שדות של סוג עבודה
+        payloads = [
+          buildFireberryPayload({
+            baseFd,
+            workTypeGroupFd: new FormData(), // ריק בכוונה
+          }),
+        ];
+      } else {
+        // רגיל: רשומה לכל בלוק "סוג עבודה"
+        payloads = workTypeGroups.map((group) => {
+          const groupFd = new FormData();
+          group.querySelectorAll('input, select, textarea').forEach((el) => {
+            appendControlToFormData(groupFd, el);
+          });
+
+          return buildFireberryPayload({
+            baseFd,
+            workTypeGroupFd: groupFd,
+          });
         });
-      });
+      }
 
       // 2.6) multipart submit: payloads + photos
       const submitFd = new FormData();
