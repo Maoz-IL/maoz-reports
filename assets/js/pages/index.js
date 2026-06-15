@@ -12,6 +12,13 @@ import { treeBindTypes } from '../data/treeBindTypes.js';
 import { compressPhotosSequential, COMPRESSION_CFG, bytesToMB } from '../compression.js';
 import { API_URL, FB_OBJECT, FB_FIELDS } from '../fireberry.schema.js';
 import { APP_FLAGS, ROUTES } from '../router.js';
+import {
+  STEP_1_PERSISTED_FIELDS,
+  clearStoredStep1Selections,
+  getNextMidnightTimestamp,
+  readStoredStep1Selections,
+  writeStoredStep1Selections,
+} from '../storage.js';
 
 // =============================================
 
@@ -384,10 +391,11 @@ formEl.addEventListener('submit', (e) => {
   }
 });
 
-// ===================
+// =================
+// Set current date
+// =================
 
 const inputDate = document.querySelectorAll('input[type="date"]');
-
 document.addEventListener('DOMContentLoaded', () => {
   const now = new Date();
   const yyyy = String(now.getFullYear());
@@ -400,8 +408,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// ===================
+// =====================
 // Initiate select types
+// =====================
 
 function initSelectBase(root) {
   const combobox = root.querySelector('[role="combobox"]');
@@ -749,7 +758,7 @@ function initSelectBase(root) {
 function initSingleSelect(root) {
   const base = initSelectBase(root);
 
-  const setSelected = (opt) => {
+  const setSelected = (opt, { close = true, focus = true } = {}) => {
     base.options().forEach((o) => o.setAttribute('aria-selected', 'false'));
     opt.setAttribute('aria-selected', 'true');
 
@@ -797,8 +806,8 @@ function initSingleSelect(root) {
       }
     }
 
-    base.close(); // נסגר בבחירה
-    base.combobox.focus();
+    if (close) base.close(); // נסגר בבחירה
+    if (focus) base.combobox.focus();
   };
 
   // קליק על אופציות
@@ -818,6 +827,19 @@ function initSingleSelect(root) {
       if (active) setSelected(active);
     }
   });
+
+  root._setSingleSelectValue = (value) => {
+    if (!value) return;
+
+    const opt = base.listbox.querySelector(
+      `[role="option"][data-value="${CSS.escape(value)}"]`,
+    );
+
+    if (!opt) return;
+
+    base.markSelectionChanged();
+    setSelected(opt, { close: false, focus: false });
+  };
 }
 
 function initMultiSelect(root) {
@@ -974,11 +996,45 @@ function initMultiSelect(root) {
     if (base.isOpen()) base.close();
   };
 
+  const setSelectedValues = (values) => {
+    selected.clear();
+
+    base.listbox.querySelectorAll('[role="option"]').forEach((opt) => {
+      opt.setAttribute('aria-selected', 'false');
+    });
+
+    values.forEach((value) => {
+      const opt = base.listbox.querySelector(
+        `[role="option"][data-value="${CSS.escape(value)}"]`,
+      );
+
+      if (!opt) return;
+
+      const optionValue = opt.dataset.value;
+      if (!optionValue) return;
+
+      const label = opt.dataset.label ?? optionValue;
+      const img = opt.dataset.img || '';
+      const alt = opt.dataset.alt || '';
+
+      selected.set(optionValue, { label, img, alt });
+      opt.setAttribute('aria-selected', 'true');
+    });
+
+    updateButtonText();
+    syncHiddenInput();
+    base.hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+    renderChips();
+  };
+
+  root._setMultiSelectValues = setSelectedValues;
+
   root._resetMultiSelect = reset; // מאפשר לקרוא מבחוץ
 }
 
 // ===================
 // Render select menus
+// ===================
 
 function renderSelectOptions(menuEl, options, config = {}) {
   if (!menuEl) return;
@@ -1025,8 +1081,6 @@ function renderSelectOptions(menuEl, options, config = {}) {
 
   menuEl.appendChild(frag);
 }
-
-// ===================
 
 const teamLeadSelectMenu = document.querySelector('.form-input-select-menu-teamLead');
 const teamMembersSelectMenu = document.querySelector(
@@ -1079,17 +1133,97 @@ treeBindTypeSelectMenus.forEach((menu) => {
   renderSelectOptions(menu, treeBindTypes, { metaKey: '', showImage: false });
 });
 
-// הפעלה לכל select כזה בדף:
-document.querySelectorAll('.form-field').forEach((field) => {
-  if (field.querySelector('.form-input-select-single-menu')) {
-    initSingleSelect(field);
-  } else if (field.querySelector('.form-input-select-multi-menu')) {
-    initMultiSelect(field);
-  }
-});
+// ===================
+// Init Selects
+// ===================
+
+function initStaticSelectFields() {
+  document.querySelectorAll('.form-field').forEach((field) => {
+    if (field.dataset.inited === '1') return;
+
+    if (field.querySelector('.form-input-select-single-menu')) {
+      initSingleSelect(field);
+      field.dataset.inited = '1';
+    } else if (field.querySelector('.form-input-select-multi-menu')) {
+      initMultiSelect(field);
+      field.dataset.inited = '1';
+    }
+  });
+}
+
+initStaticSelectFields();
+
+// ===============================
+// Step 1 Persistence
+// ===============================
+
+function getHiddenInputByName(name) {
+  return document.querySelector(`input[type="hidden"][name="${name}"]`);
+}
+
+function getSelectFieldByName(name) {
+  return getHiddenInputByName(name)?.closest('.form-field') ?? null;
+}
+
+function getCurrentStep1PersistedValues() {
+  const values = {};
+
+  STEP_1_PERSISTED_FIELDS.forEach((name) => {
+    const input = getHiddenInputByName(name);
+    values[name] = input?.value ?? '';
+  });
+
+  return values;
+}
+
+function saveStep1PersistedValues() {
+  writeStoredStep1Selections(getCurrentStep1PersistedValues());
+}
+
+function csvToValues(value) {
+  return String(value || '')
+    .split(',')
+    .map((v) => v.trim())
+    .filter(Boolean);
+}
+
+function restoreStep1PersistedValues() {
+  const values = readStoredStep1Selections();
+  if (!values) return;
+
+  const teamLeadField = getSelectFieldByName('teamLead');
+  const teamMembersField = getSelectFieldByName('teamMembers');
+  const vehiclesField = getSelectFieldByName('vehicles');
+
+  teamLeadField?._setSingleSelectValue?.(values.teamLead);
+  teamMembersField?._setMultiSelectValues?.(csvToValues(values.teamMembers));
+  vehiclesField?._setMultiSelectValues?.(csvToValues(values.vehicles));
+
+  queueMicrotask(() => updateNextButtonUI());
+}
+
+function initStep1Persistence() {
+  restoreStep1PersistedValues();
+
+  STEP_1_PERSISTED_FIELDS.forEach((name) => {
+    const input = getHiddenInputByName(name);
+    if (!input) return;
+
+    input.addEventListener('change', saveStep1PersistedValues);
+  });
+
+  const msUntilMidnight = getNextMidnightTimestamp() - Date.now();
+
+  window.setTimeout(() => {
+    clearStoredStep1Selections();
+  }, msUntilMidnight);
+}
+
+initStep1Persistence();
 
 // ===================
 // שדות המשך
+// ===================
 
 const splitWhen = (str) =>
   (str || '')
