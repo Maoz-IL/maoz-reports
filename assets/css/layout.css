@@ -12,6 +12,10 @@ form .steps {
   padding: 1.1rem 0;
 }
 
+.footer-wrapper {
+  padding-bottom: 1.5em;
+}
+
 header,
 .main,
 footer {
