@@ -514,20 +514,40 @@ function initSelectBase(root) {
     }
   };
 
-  const scrollMenuFullyIntoView = (gap = 16) => {
+  const scrollMenuToViewportCenter = (gap = 16) => {
     requestAnimationFrame(() => {
-      const rect = listbox.getBoundingClientRect();
-      const vh = window.innerHeight;
+      requestAnimationFrame(() => {
+        if (listbox.hidden) return;
 
-      // כמה "יוצא" מהמסך למטה / למעלה
-      const overflowBottom = rect.bottom - (vh - gap);
-      const overflowTop = gap - rect.top;
+        const rect = listbox.getBoundingClientRect();
 
-      if (overflowBottom > 0) {
-        window.scrollBy({ top: overflowBottom, behavior: 'smooth' });
-      } else if (overflowTop > 0) {
-        window.scrollBy({ top: -overflowTop, behavior: 'smooth' });
-      }
+        const header = document.querySelector('header');
+        const footer = document.querySelector('footer');
+
+        const headerBottom = header?.getBoundingClientRect().bottom ?? 0;
+        const footerTop = footer?.getBoundingClientRect().top ?? window.innerHeight;
+
+        const viewportTop = Math.max(headerBottom, 0) + gap;
+        const viewportBottom = Math.min(footerTop, window.innerHeight) - gap;
+
+        const availableHeight = viewportBottom - viewportTop;
+
+        if (availableHeight <= 0) return;
+
+        const viewportCenter = viewportTop + availableHeight / 2;
+        const menuCenter = rect.top + rect.height / 2;
+
+        const delta = menuCenter - viewportCenter;
+
+        // אם ההפרש קטן, אין צורך בגלילה שמרגישה קופצנית
+        if (Math.abs(delta) < 12) return;
+
+        window.scrollBy({
+          top: delta,
+          left: 0,
+          behavior: 'smooth',
+        });
+      });
     });
   };
 
@@ -537,7 +557,7 @@ function initSelectBase(root) {
     combobox.setAttribute('aria-expanded', 'true');
     listbox.hidden = false;
 
-    scrollMenuFullyIntoView(16);
+    scrollMenuToViewportCenter(16);
 
     const opts = options();
     const selectedIndex = opts.findIndex(
@@ -667,7 +687,6 @@ function initSelectBase(root) {
       // iOS: חייבים למנוע ברירת מחדל כדי לא לתת לכפתור לגנוב פוקוס
       e.preventDefault();
 
-      combobox.scrollIntoView({ block: 'center', inline: 'nearest' });
       searchEl.focus();
     };
 
