@@ -168,6 +168,7 @@ footer.has-shadow {
 .footer-stage-indicator {
   display: flex;
   justify-content: center;
+  gap: 0.4rem;
 
   margin-top: 1rem;
 }
@@ -215,15 +216,6 @@ form .steps fieldset {
   text-align: center;
 
   transition: opacity 300ms ease;
-}
-
-form .steps fieldset,
-div[data-work-type-container],
-.form-fields-group,
-.form-followup-group {
-  display: flex;
-  flex-direction: column;
-  row-gap: 2rem;
 }
 
 form .steps fieldset:nth-of-type(4) {

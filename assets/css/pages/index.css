@@ -18,15 +18,17 @@ body {
   align-items: center;
 
   font-weight: 700;
+  opacity: 70%;
 }
 
 h1 {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 800;
+  margin-bottom: 0.15rem;
 }
 
 .main-title p {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   opacity: 70%;
 }
 
@@ -35,9 +37,9 @@ h1 {
 }
 
 .main-title-stage-indicator {
-  --height: 1.75rem;
+  --height: 1.65rem;
 
-  width: 1.5rem;
+  width: 1.4rem;
   height: var(--height);
   overflow: hidden;
 
@@ -46,8 +48,6 @@ h1 {
   color: var(--color-light-2);
   background-color: var(--color-primary-1);
   border-radius: var(--border-radius-s);
-
-  opacity: 70%;
 }
 
 .main-title-stage-indicator .container {
