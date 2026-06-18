@@ -21,6 +21,13 @@ export const workers = [
     alt: 'תמונת הפרופיל של העובד',
   },
   {
+    value: 'מוחמד דעאיף',
+    label: 'מוחמד דעאיף',
+    role: 'ראש צוות',
+    img: '/assets/images/profile-blank-xs.avif',
+    alt: 'תמונת הפרופיל של העובד',
+  },
+  {
     value: 'מועאד מסארווה',
     label: 'מועאד מסארווה',
     role: 'ראש צוות',
@@ -86,13 +93,6 @@ export const workers = [
   {
     value: 'יאסין אבו יאסין',
     label: 'יאסין אבו יאסין',
-    role: 'עובד',
-    img: '/assets/images/profile-blank-xs.avif',
-    alt: 'תמונת הפרופיל של העובד',
-  },
-  {
-    value: 'מוחמד דעאיף',
-    label: 'מוחמד דעאיף',
     role: 'עובד',
     img: '/assets/images/profile-blank-xs.avif',
     alt: 'תמונת הפרופיל של העובד',
