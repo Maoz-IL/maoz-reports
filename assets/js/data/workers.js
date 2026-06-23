@@ -49,6 +49,13 @@ export const workers = [
     alt: 'תמונת הפרופיל של העובד',
   },
   {
+    value: 'רפעת אבו יאסין',
+    label: 'רפעת אבו יאסין',
+    role: 'ראש צוות',
+    img: '/assets/images/profile-blank-xs.avif',
+    alt: 'תמונת הפרופיל של העובד',
+  },
+  {
     value: 'אדהם',
     label: 'אדהם',
     role: 'קבלן',
@@ -107,13 +114,6 @@ export const workers = [
   {
     value: 'ספוות שיכה',
     label: 'ספוות שיכה',
-    role: 'עובד',
-    img: '/assets/images/profile-blank-xs.avif',
-    alt: 'תמונת הפרופיל של העובד',
-  },
-  {
-    value: 'רפעת אבו יאסין',
-    label: 'רפעת אבו יאסין',
     role: 'עובד',
     img: '/assets/images/profile-blank-xs.avif',
     alt: 'תמונת הפרופיל של העובד',
