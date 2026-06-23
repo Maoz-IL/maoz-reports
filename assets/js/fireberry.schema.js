@@ -31,6 +31,7 @@ export const FB_FIELDS = {
   treeBindLength: 'pcfsystemfield1043',
   workHourDescription: 'pcfsystemfield1019',
   transportsCount: 'pcfsystemfield1024',
+  amountGeneral: 'pcfsystemfield1045',
   treeStumpForCharge: 'pcfsystemfield1028',
   workTypeDetails: 'pcfsystemfield1031',
   workTypeNotes: 'pcfsystemfield1033',
