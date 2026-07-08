@@ -819,18 +819,19 @@
                         ></ul>
                       </div>
                     </div>
-                    <!-- כמות העצים -->
+                    <!-- כמות העצים/כללי -->
                     <div
                       class="form-field"
                       data-field="number"
-                      data-show-when="גיזום|גיזום נקודתי|חישוף|כריתה|סקר יציבות עצים במוסדות חינוך|סקר תכנון ובנייה"
+                      data-show-when="גיזום|גיזום נקודתי|חישוף|כריתה|סקר יציבות עצים במוסדות חינוך|סקר תכנון ובנייה|שעת עבודה|שעת חירום|כרסום"
+                      data-general-label-when="שעת עבודה|שעת חירום|כרסום"
                     >
                       <label
                         class="form-label form-label-required"
-                        for="trees-count"
-                        id="trees-count__label"
+                        for="quantity"
+                        id="quantity__label"
                       >
-                        כמות העצים
+                        <span data-label-text>כמות העצים</span>
                         <span class="form-label-asterisk">*</span>
                       </label>
 
@@ -838,8 +839,8 @@
                         <input
                           class="form-input"
                           type="number"
-                          name="treesCount"
-                          id="trees-count"
+                          name="quantity"
+                          id="quantity"
                           inputmode="numeric"
                           min="0"
                           step="1"
@@ -1050,34 +1051,6 @@
                           type="number"
                           name="treeBindLength"
                           id="tree-bind-length"
-                          inputmode="numeric"
-                          min="0"
-                          step="1"
-                          data-required-when-visible
-                        />
-                      </div>
-                    </div>
-                    <!-- כמות (כללי) -->
-                    <div
-                      class="form-field"
-                      data-field="number"
-                      data-show-when="שעת עבודה|שעת חירום|כרסום"
-                    >
-                      <label
-                        class="form-label form-label-required"
-                        for="amount-general"
-                        id="amount-general__label"
-                      >
-                        כמות (כללי)
-                        <span class="form-label-asterisk">*</span>
-                      </label>
-
-                      <div class="form-control">
-                        <input
-                          class="form-input"
-                          type="number"
-                          name="amountGeneral"
-                          id="amount-general"
                           inputmode="numeric"
                           min="0"
                           step="1"

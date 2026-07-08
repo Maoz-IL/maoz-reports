@@ -1510,6 +1510,15 @@ function initWorkTypeGroup(groupEl) {
       const allowed = new Set(split(field.dataset.showWhen));
       const shouldShow = allowed.has(value);
 
+      const generalLabelWhen = new Set(split(field.dataset.generalLabelWhen));
+      const labelText = field.querySelector('[data-label-text]');
+
+      if (labelText && field.querySelector('[name="quantity"]')) {
+        labelText.textContent = generalLabelWhen.has(value)
+          ? 'כמות (כללי)'
+          : 'כמות העצים';
+      }
+
       field.hidden = !shouldShow;
 
       field.querySelectorAll('[data-required-when-visible]').forEach((el) => {
@@ -1905,7 +1914,7 @@ function buildFireberryPayload({ baseFd, workTypeGroupFd = new FormData() }) {
 
     // נרמול בסיסי:
     // מספרים שהגיעו כמחרוזת -> מספר
-    if (formKey === 'treesCount') {
+    if (formKey === 'quantity') {
       const raw = String(formValue ?? '').trim();
       if (raw === '') continue;
       const n = Number(raw);
