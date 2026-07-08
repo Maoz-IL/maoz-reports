@@ -17,6 +17,7 @@ export const FB_FIELDS = {
   date: 'pcfsystemfield1007',
   teamLead: 'name',
   teamMembers: 'pcfsystemfield1009',
+  teamMembersDetails: 'pcfsystemfield1046',
   vehicles: 'pcfsystemfield1010',
   customer: 'pcfsystemfield1013',
   address: 'pcfsystemfield1012',

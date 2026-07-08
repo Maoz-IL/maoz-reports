@@ -1287,6 +1287,9 @@ function initConditionalFollowups() {
     const hidden = triggerField.querySelector('input[type="hidden"]');
     if (!hidden || !target) return;
 
+    const isMultiSelect = triggerField.querySelector('.form-input-select-multi-menu');
+    if (isMultiSelect) return;
+
     const apply = () => {
       const shouldShow = showWhen.has(hidden.value);
 
@@ -1305,8 +1308,45 @@ function initConditionalFollowups() {
   });
 }
 
+function initMultiSelectConditionalFollowups() {
+  const triggers = document.querySelectorAll(
+    '[data-followups-target][data-followups-show-when]',
+  );
+
+  triggers.forEach((triggerField) => {
+    const hidden = triggerField.querySelector('input[type="hidden"]');
+    const targetSelector = triggerField.dataset.followupsTarget;
+    const target = document.querySelector(targetSelector);
+    const showWhen = new Set(splitWhen(triggerField.dataset.followupsShowWhen));
+
+    const isMultiSelect = triggerField.querySelector('.form-input-select-multi-menu');
+
+    if (!hidden || !target || !isMultiSelect) return;
+
+    const apply = () => {
+      const selectedValues = String(hidden.value || '')
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean);
+
+      const shouldShow = selectedValues.some((value) => showWhen.has(value));
+
+      target.hidden = !shouldShow;
+      setRequiredInArea(target, shouldShow);
+
+      if (!shouldShow) resetFollowupsArea(target);
+
+      queueMicrotask(() => updateNextButtonUI());
+    };
+
+    hidden.addEventListener('change', apply);
+    apply();
+  });
+}
+
 // להפעיל אחרי שכל ה-selects אותחלו:
 initConditionalFollowups();
+initMultiSelectConditionalFollowups();
 
 // ===================
 // Default customer on load

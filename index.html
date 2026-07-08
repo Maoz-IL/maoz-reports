@@ -214,6 +214,8 @@
                 data-field="multi-select"
                 data-multi-singular="חבר צוות"
                 data-multi-plural="חברי צוות"
+                data-followups-target="#teamMembersFollowups"
+                data-followups-show-when="אחר"
               >
                 <label class="form-label form-label-required" for="">
                   חברי הצוות
@@ -252,6 +254,33 @@
                   ></ul>
                   <!-- האפשרויות שנבחרו -->
                   <ul class="form-input-select-multi-chosen"></ul>
+                </div>
+              </div>
+              <!-- שדות המשך לחברי הצוות -->
+              <div
+                class="form-followup-group team-members-followups"
+                id="teamMembersFollowups"
+                hidden
+              >
+                <!-- פירוט חבר צוות אחר -->
+                <div class="form-field" data-field="textarea" data-show-when="אחר">
+                  <label
+                    class="form-label form-label-required"
+                    for="team-members-details"
+                    id="team-members-details__label"
+                  >
+                    פירוט על העובד/ים האחר/ים
+                    <span class="form-label-asterisk">*</span>
+                  </label>
+                  <div class="form-control">
+                    <textarea
+                      class="form-input"
+                      name="teamMembersDetails"
+                      id="team-members-details"
+                      rows="4"
+                      data-required-when-visible
+                    ></textarea>
+                  </div>
                 </div>
               </div>
               <!-- כלי רכב -->
