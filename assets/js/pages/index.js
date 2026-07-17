@@ -1448,6 +1448,18 @@ function resetNewGroup(groupEl) {
   });
 }
 
+const TREE_TYPE_LIMITS_BY_WORK_TYPE = {
+  חישוף: ['וושינגטוניה'],
+};
+
+const getTreeTypeOptionsForWorkType = (workType) => {
+  const allowedValues = TREE_TYPE_LIMITS_BY_WORK_TYPE[workType];
+
+  if (!allowedValues) return treeTypes;
+
+  return treeTypes.filter((tree) => allowedValues.includes(tree.value));
+};
+
 function initWorkTypeGroup(groupEl) {
   // 1) Render menus בתוך הבלוק בלבד
   groupEl.querySelectorAll('.form-input-select-menu-work-type').forEach((menu) => {
@@ -1481,6 +1493,12 @@ function initWorkTypeGroup(groupEl) {
     }
   });
 
+  const treeTypeField = groupEl
+    .querySelector('input[type="hidden"][name="treeType"]')
+    ?.closest('.form-field');
+
+  const treeTypeMenu = treeTypeField?.querySelector('.form-input-select-menu-tree-type');
+
   // 3) Conditional followups בתוך הבלוק (scoped!)
   const followups = groupEl.querySelector('.work-type-followups');
   const workTypeHidden = groupEl.querySelector('input[type="hidden"][name="workType"]');
@@ -1502,9 +1520,45 @@ function initWorkTypeGroup(groupEl) {
     });
   };
 
+  const updateTreeTypeOptions = (workTypeValue) => {
+    if (!treeTypeField || !treeTypeMenu) return;
+
+    const options = getTreeTypeOptionsForWorkType(workTypeValue);
+
+    renderSelectOptions(treeTypeMenu, options, {
+      metaKey: '',
+      showImage: false,
+    });
+
+    const treeTypeHidden = treeTypeField.querySelector(
+      'input[type="hidden"][name="treeType"]',
+    );
+
+    if (!treeTypeHidden) return;
+
+    const singleOption = options.length === 1 ? options[0] : null;
+
+    if (singleOption) {
+      treeTypeField._setSingleSelectValue?.(singleOption.value);
+      return;
+    }
+
+    treeTypeHidden.value = '';
+
+    const valueEl = treeTypeField.querySelector('[data-select-value]');
+    if (valueEl) valueEl.textContent = '‎';
+
+    treeTypeField.querySelectorAll('[role="option"]').forEach((opt) => {
+      opt.setAttribute('aria-selected', 'false');
+      opt.classList.remove('is-active');
+    });
+  };
+
   const apply = () => {
     const value = workTypeHidden.value;
     let anyVisible = false;
+
+    updateTreeTypeOptions(value);
 
     followups.querySelectorAll('.form-field[data-show-when]').forEach((field) => {
       const allowed = new Set(split(field.dataset.showWhen));
