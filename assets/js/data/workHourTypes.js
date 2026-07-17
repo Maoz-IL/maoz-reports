@@ -15,4 +15,8 @@ export const workHourTypes = [
     value: 'ניקוי רשתות הצללה',
     label: 'ניקוי רשתות הצללה',
   },
+  {
+    value: 'פינוי ענפים',
+    label: 'פינוי ענפים',
+  },
 ];
