@@ -1164,22 +1164,24 @@ function initFreeTextAutocomplete({
   maxResults = 30,
   minChars = 1,
   appendSpaceOnSelect = true,
+  showAllWhenEmpty = false,
 }) {
   if (!input || !listbox || !Array.isArray(options)) return;
 
   let activeIndex = -1;
+  let hasFocus = false;
 
   const normalize = (value) =>
     String(value ?? '')
       .trim()
       .toLowerCase();
 
-  const getOptionText = (option) => {
-    return String(option.label ?? option.value ?? '').trim();
-  };
-
   const getMatches = (query) => {
     const q = normalize(query);
+
+    if (!q) {
+      return showAllWhenEmpty && hasFocus ? options : [];
+    }
 
     if (q.length < minChars) return [];
 
@@ -1207,6 +1209,7 @@ function initFreeTextAutocomplete({
 
     listbox.querySelectorAll('[role="option"]').forEach((option) => {
       option.classList.remove('is-active');
+      option.setAttribute('aria-selected', 'false');
     });
   };
 
@@ -1288,7 +1291,12 @@ function initFreeTextAutocomplete({
   input.addEventListener('input', render);
 
   input.addEventListener('focus', () => {
+    hasFocus = true;
     render();
+  });
+
+  input.addEventListener('blur', () => {
+    hasFocus = false;
   });
 
   input.addEventListener('keydown', (e) => {
@@ -1323,7 +1331,6 @@ function initFreeTextAutocomplete({
       if (!isOpen()) return;
 
       const active = items[activeIndex];
-
       if (!active) return;
 
       e.preventDefault();
@@ -1393,6 +1400,8 @@ initFreeTextAutocomplete({
   input: addressInput,
   listbox: addressListbox,
   options: petahTikvaStreets,
+  maxResults: 30,
+  showAllWhenEmpty: true,
 });
 
 // ===============================
