@@ -2058,7 +2058,7 @@ initHeaderShadowAfterPassingTitle();
 // =====================================
 
 function initCancelModal() {
-  const cancelBtn = document.querySelector('.btn-cancel'); // אם יש לך class אחר – תחליף
+  const cancelBtn = document.querySelector('.btn-cancel');
   const dialog = document.querySelector('#cancelModal');
   const confirmBtn = document.querySelector('#btnConfirmCancel');
 
@@ -2070,14 +2070,15 @@ function initCancelModal() {
   });
 
   // אם המשתמש לחץ על "כן, מחק טופס"
-  confirmBtn.addEventListener('click', (e) => {
-    // הדיאלוג ייסגר אוטומטית כי זה submit בתוך method="dialog"
-    // אבל אנחנו רוצים גם רענון:
-    // נותנים לדפדפן לסגור ואז מרעננים
+  confirmBtn.addEventListener('click', () => {
+    // מנקה גם את בחירות שלב 1 שנשמרו ב-localStorage
+    clearStoredStep1Selections();
+
+    // נותנים לדפדפן לסגור את הדיאלוג ואז מרעננים
     setTimeout(() => window.location.reload(), 0);
   });
 
-  // סגירה בלחיצה על הרקע (אופציונלי אבל נוח)
+  // סגירה בלחיצה על הרקע
   dialog.addEventListener('click', (e) => {
     if (e.target === dialog) dialog.close();
   });
