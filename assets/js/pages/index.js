@@ -78,6 +78,29 @@ function showSubmitError(message) {
   if (submitErrorDetail) submitErrorDetail.textContent = message || 'שגיאה לא ידועה';
 }
 
+function cleanSubmitErrorMessage(message) {
+  const raw = String(message || '').trim();
+
+  if (!raw) return 'השליחה נכשלה. נסו שוב.';
+
+  const looksLikeHtml =
+    raw.includes('<!DOCTYPE html') ||
+    raw.includes('<html') ||
+    raw.includes('</html>') ||
+    raw.includes('<body') ||
+    raw.includes('Server Error');
+
+  if (looksLikeHtml) {
+    return 'השליחה נכשלה בגלל שגיאת שרת חיצוני. נסו שוב בעוד כמה דקות או פנו לתמיכה.';
+  }
+
+  if (raw.includes('406')) {
+    return 'השליחה נכשלה בגלל שגיאת שרת חיצוני. נסו שוב בעוד כמה דקות או פנו לתמיכה.';
+  }
+
+  return raw;
+}
+
 function hideSubmitIndicator() {
   if (!submitIndicator) return;
   submitIndicator.hidden = true;
@@ -2361,7 +2384,8 @@ form.addEventListener('submit', async (e) => {
 
       // אם השרת/פונקציה החזירו HTTP שגיאה:
       if (!res.ok) {
-        showSubmitError(out?.error || out?.message || `HTTP ${res.status}`);
+        const detail = out?.error || out?.message || `HTTP ${res.status}`;
+        showSubmitError(cleanSubmitErrorMessage(detail));
         if (btnNext) btnNext.disabled = prevNextDisabled ?? false;
         return;
       }
@@ -2382,7 +2406,7 @@ form.addEventListener('submit', async (e) => {
           firstCreateFail?.response?.raw ||
           'השליחה נכשלה. נסו שוב.';
 
-        showSubmitError(detail);
+        showSubmitError(cleanSubmitErrorMessage(detail));
         if (btnNext) btnNext.disabled = prevNextDisabled ?? false;
         return;
       }
@@ -2397,7 +2421,7 @@ form.addEventListener('submit', async (e) => {
       hideSubmitIndicator();
       if (btnNext) btnNext.disabled = prevNextDisabled ?? false;
     } catch (err) {
-      showSubmitError(err?.message || 'תקלה ברשת/שרת. נסו שוב.');
+      showSubmitError(cleanSubmitErrorMessage(err?.message || 'תקלה ברשת/שרת. נסו שוב.'));
       if (btnNext) btnNext.disabled = prevNextDisabled ?? false;
     }
   };
