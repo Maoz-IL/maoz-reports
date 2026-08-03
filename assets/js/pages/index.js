@@ -1165,6 +1165,7 @@ function initFreeTextAutocomplete({
   minChars = 1,
   appendSpaceOnSelect = true,
   showAllWhenEmpty = false,
+  metaKey = null,
 }) {
   if (!input || !listbox || !Array.isArray(options)) return;
 
@@ -1263,6 +1264,7 @@ function initFreeTextAutocomplete({
     matches.forEach((option) => {
       const value = option.value ?? option.label ?? '';
       const label = option.label ?? value;
+      const meta = metaKey && option[metaKey] ? String(option[metaKey]) : '';
 
       const li = document.createElement('li');
       li.className = 'form-input-select-menu-option';
@@ -1273,11 +1275,14 @@ function initFreeTextAutocomplete({
       li.dataset.value = value;
       li.dataset.label = label;
 
+      if (meta) li.dataset.meta = meta;
+
       li.innerHTML = `
-        <span class="option-image-text-group">
-          <span class="option-text">${label}</span>
-        </span>
-      `;
+      <span class="option-image-text-group">
+        <span class="option-text">${label}</span>
+      </span>
+      ${meta ? `<span class="option-role">${meta}</span>` : ''}
+    `;
 
       frag.appendChild(li);
     });
@@ -1396,12 +1401,18 @@ initStaticSelectFields();
 const addressInput = document.querySelector('#address');
 const addressListbox = document.querySelector('#address__listbox');
 
+const petahTikvaStreetOptions = petahTikvaStreets.map((street) => ({
+  ...street,
+  city: 'פתח תקווה',
+}));
+
 initFreeTextAutocomplete({
   input: addressInput,
   listbox: addressListbox,
-  options: petahTikvaStreets,
+  options: petahTikvaStreetOptions,
   maxResults: 30,
   showAllWhenEmpty: true,
+  metaKey: 'city',
 });
 
 // ===============================
