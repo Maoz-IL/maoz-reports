@@ -1367,6 +1367,12 @@ function initFreeTextAutocomplete({
 function initStaticSelectFields() {
   document.querySelectorAll('.form-field').forEach((field) => {
     if (field.dataset.inited === '1') return;
+    if (field.dataset.field === 'autocomplete') return;
+
+    const hiddenInput = field.querySelector('input[type="hidden"][name]');
+    const valueEl = field.querySelector('[data-select-value]');
+
+    if (!hiddenInput || !valueEl) return;
 
     if (field.querySelector('.form-input-select-single-menu')) {
       initSingleSelect(field);
