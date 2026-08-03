@@ -382,27 +382,44 @@
                 </div>
               </div>
               <!-- כתובת -->
-              <div class="form-field" data-field="text">
+              <div
+                class="form-field"
+                data-field="autocomplete"
+                data-autocomplete="address"
+              >
                 <label class="form-label form-label-required" for="address">
                   כתובת
                   <span class="form-label-asterisk">*</span>
                 </label>
+
                 <div class="form-control">
                   <input
                     type="text"
                     id="address"
                     name="address"
                     class="form-input"
-                    autocomplete=""
+                    autocomplete="off"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-expanded="false"
+                    aria-controls="address__listbox"
                     aria-describedby=""
                     aria-invalid=""
                     required
                   />
+
                   <span
                     class="form-input-icon form-input-icon-address"
                     aria-hidden="true"
-                  >
-                  </span>
+                  ></span>
+
+                  <ul
+                    class="form-input-select-menu form-input-select-single-menu form-input-autocomplete-menu form-input-autocomplete-menu-address"
+                    id="address__listbox"
+                    role="listbox"
+                    tabindex="-1"
+                    hidden
+                  ></ul>
                 </div>
               </div>
               <!-- סטטוס המשימה באתר -->

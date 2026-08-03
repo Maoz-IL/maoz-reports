@@ -5,6 +5,7 @@
 import { workers } from '../data/workers.js';
 import { vehicles } from '../data/vehicles.js';
 import { customers } from '../data/customers.js';
+import { petahTikvaStreets } from '../data/petahTikvaStreets.js';
 import { workTypes } from '../data/workTypes.js';
 import { workHourTypes } from '../data/workHourTypes.js';
 import { treeTypes } from '../data/treeTypes.js';
@@ -1152,6 +1153,213 @@ treeBindTypeSelectMenus.forEach((menu) => {
   renderSelectOptions(menu, treeBindTypes, { metaKey: '', showImage: false });
 });
 
+// ===========================
+// Free text autocomplete menus
+// ===========================
+
+function initFreeTextAutocomplete({
+  input,
+  listbox,
+  options,
+  maxResults = 30,
+  minChars = 1,
+  appendSpaceOnSelect = true,
+}) {
+  if (!input || !listbox || !Array.isArray(options)) return;
+
+  let activeIndex = -1;
+
+  const normalize = (value) =>
+    String(value ?? '')
+      .trim()
+      .toLowerCase();
+
+  const getOptionText = (option) => {
+    return String(option.label ?? option.value ?? '').trim();
+  };
+
+  const getMatches = (query) => {
+    const q = normalize(query);
+
+    if (q.length < minChars) return [];
+
+    return options
+      .filter((option) => {
+        const label = normalize(option.label);
+        const value = normalize(option.value);
+
+        return label.includes(q) || value.includes(q);
+      })
+      .slice(0, maxResults);
+  };
+
+  const isOpen = () => input.getAttribute('aria-expanded') === 'true';
+
+  const open = () => {
+    input.setAttribute('aria-expanded', 'true');
+    listbox.hidden = false;
+  };
+
+  const close = () => {
+    input.setAttribute('aria-expanded', 'false');
+    listbox.hidden = true;
+    activeIndex = -1;
+
+    listbox.querySelectorAll('[role="option"]').forEach((option) => {
+      option.classList.remove('is-active');
+    });
+  };
+
+  const setActive = (index) => {
+    const items = Array.from(listbox.querySelectorAll('[role="option"]'));
+
+    items.forEach((item) => {
+      item.classList.remove('is-active');
+      item.setAttribute('aria-selected', 'false');
+    });
+
+    const item = items[index];
+    if (!item) return;
+
+    item.classList.add('is-active');
+    item.setAttribute('aria-selected', 'true');
+    item.scrollIntoView({ block: 'nearest' });
+
+    activeIndex = index;
+  };
+
+  const selectOption = (optionEl) => {
+    const value = optionEl?.dataset.value;
+    if (!value) return;
+
+    input.value = appendSpaceOnSelect ? `${value} ` : value;
+
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+
+    close();
+
+    input.focus();
+
+    const end = input.value.length;
+    input.setSelectionRange(end, end);
+  };
+
+  const render = () => {
+    const matches = getMatches(input.value);
+
+    listbox.textContent = '';
+
+    if (!matches.length) {
+      close();
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+
+    matches.forEach((option) => {
+      const value = option.value ?? option.label ?? '';
+      const label = option.label ?? value;
+
+      const li = document.createElement('li');
+      li.className = 'form-input-select-menu-option';
+      li.setAttribute('role', 'option');
+      li.setAttribute('tabindex', '-1');
+      li.setAttribute('aria-selected', 'false');
+
+      li.dataset.value = value;
+      li.dataset.label = label;
+
+      li.innerHTML = `
+        <span class="option-image-text-group">
+          <span class="option-text">${label}</span>
+        </span>
+      `;
+
+      frag.appendChild(li);
+    });
+
+    listbox.appendChild(frag);
+
+    open();
+    setActive(0);
+  };
+
+  input.addEventListener('input', render);
+
+  input.addEventListener('focus', () => {
+    render();
+  });
+
+  input.addEventListener('keydown', (e) => {
+    const items = Array.from(listbox.querySelectorAll('[role="option"]'));
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+
+      if (!isOpen()) {
+        render();
+        return;
+      }
+
+      if (!items.length) return;
+
+      const nextIndex = Math.min(activeIndex + 1, items.length - 1);
+      setActive(nextIndex);
+      return;
+    }
+
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+
+      if (!items.length) return;
+
+      const nextIndex = Math.max(activeIndex - 1, 0);
+      setActive(nextIndex);
+      return;
+    }
+
+    if (e.key === 'Enter') {
+      if (!isOpen()) return;
+
+      const active = items[activeIndex];
+
+      if (!active) return;
+
+      e.preventDefault();
+      selectOption(active);
+      return;
+    }
+
+    if (e.key === 'Escape') {
+      if (!isOpen()) return;
+
+      e.preventDefault();
+      close();
+    }
+  });
+
+  listbox.addEventListener('pointerdown', (e) => {
+    // מונע מה-input לאבד focus לפני הבחירה
+    e.preventDefault();
+  });
+
+  listbox.addEventListener('click', (e) => {
+    const option = e.target.closest('[role="option"]');
+    if (!option) return;
+
+    selectOption(option);
+  });
+
+  document.addEventListener('pointerdown', (e) => {
+    if (!input.closest('.form-field')?.contains(e.target)) {
+      close();
+    }
+  });
+
+  close();
+}
+
 // ===================
 // Init Selects
 // ===================
@@ -1171,6 +1379,15 @@ function initStaticSelectFields() {
 }
 
 initStaticSelectFields();
+
+const addressInput = document.querySelector('#address');
+const addressListbox = document.querySelector('#address__listbox');
+
+initFreeTextAutocomplete({
+  input: addressInput,
+  listbox: addressListbox,
+  options: petahTikvaStreets,
+});
 
 // ===============================
 // Step 1 Persistence
