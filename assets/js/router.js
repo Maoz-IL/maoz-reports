@@ -4,5 +4,6 @@ export const APP_FLAGS = {
 };
 
 export const ROUTES = {
-  success: './success.html',
+  success: '/success',
+  warningImages: '/warning-images',
 };

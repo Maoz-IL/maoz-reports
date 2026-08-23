@@ -2413,11 +2413,14 @@ form.addEventListener('submit', async (e) => {
 
       // הצלחה: redirect אם צריך
       if (!APP_FLAGS.dryRun && out?.ok && APP_FLAGS.redirectOnSubmit) {
-        window.location.href = ROUTES.success;
+        const nextRoute =
+          out?.uploadsOk === false ? ROUTES.warningImages : ROUTES.success;
+
+        window.location.href = nextRoute;
         return;
       }
 
-      // הצלחה בלי redirect (dryRun וכו')
+      // הצלחה בלי redirect (dryRun מתאים למצב)
       hideSubmitIndicator();
       if (btnNext) btnNext.disabled = prevNextDisabled ?? false;
     } catch (err) {

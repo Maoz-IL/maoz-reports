@@ -228,13 +228,18 @@ exports.handler = async (event) => {
       });
     }
 
-    const allOk = results.every((r) => r.ok) && uploads.every((u) => u.ok);
+    const recordsOk = results.every((r) => r.ok);
+    const uploadsOk = uploads.every((u) => u.ok);
 
     return {
-      statusCode: allOk ? 200 : 207,
+      statusCode: recordsOk ? 200 : 207,
       body: JSON.stringify({
-        ok: allOk,
+        ok: recordsOk,
         mode: 'live',
+        recordsOk,
+        uploadsOk,
+        warning:
+          recordsOk && !uploadsOk ? 'records_created_but_some_photos_failed' : null,
         results,
         uploads,
         attachedTo: { objectId: firstObjectId, recordId: firstRecordId },
